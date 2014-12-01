@@ -1,0 +1,22 @@
+{
+    "name": "rbnvrw/hermes",
+    "type": "library",
+    "description": "Hermes CMS is a light-weight file based content management system",
+    "homepage": "http://rubenverweij.nl/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ruben Verweij",
+            "email": "rbnvrw@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.4",
+        "twig/twig": "1.12.*",
+        "michelf/php-markdown": "1.3"
+    },
+    "autoload": {
+        "files": ["lib/Hermes.php"]
+    },
+    "minimum-stability": "dev"
+}
