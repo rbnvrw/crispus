@@ -1,4 +1,4 @@
-hermes
+Crispus CMS
 ======
 
-Hermes CMS is a light-weight file based content management system
+Crispus CMS is a light-weight file based content management system
