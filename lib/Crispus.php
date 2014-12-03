@@ -141,24 +141,30 @@ class Crispus {
 			$sContent = $this->get404Page();
 		}
 		
+		// Get all javascript and css assets
+		$sThemePath = $this->getConfig('crispus_paths', 'themes').'/' . $sTheme . '/';
+		$this->oJS = $this->oCurrentPage->getJavascriptAssets();
+		$this->oCSS = $this->oCurrentPage->getCSSAssets();
+		
+		// Run Twig
+		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->getConfig('twig');
+		$aTwigVars = array(
+			'content' => $sContent,
+			'javascript' => $this->oJS->dump(),
+			'css' => $this->oCSS->dump()
+		);
+		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
+	}
+	
+	private function runTwig($sTheme, $sTemplate, $aConfig, $aVars){
 		// Pass it through Twig (load the theme)
 		\Twig_Autoloader::register();
 		
-		$oLoader = new \Twig_Loader_Filesystem($this->getConfig('crispus_paths', 'themes').'/' . $sCurrentTheme . '/');
+		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
-		// Todo: default twig config + controller options
-		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->getConfig('twig');
+		$oTwig = new \Twig_Environment($oLoader, $aConfig);
 		
-		$oTwig = new \Twig_Environment($oLoader, $aTwigConfig);
-		
-		// Twig variables
-		$aTwigVars = $this->oCurrentPage->aCustomTwigVars + array(
-			'content' => $sContent
-		);
-		
-		$sOutput = $oTwig->render($sCurrentTemplate.'.html', $aTwigVars);
-	
-		echo $sOutput;
+		return $oTwig->render($sTemplate.'.html', $aVars);
 	}
     
     private function get404Page(){
