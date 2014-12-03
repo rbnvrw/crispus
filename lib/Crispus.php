@@ -12,6 +12,10 @@ namespace RubenVerweij;
 class Crispus {
 
     private static $aConfig = array();
+	private $sDefaultController = 'IndexController';
+	private $sControllerExt = 'php';
+	private $oCurrentPage;
+	private $sDefaultTemplate = 'index';
 
     public function __construct($sConfigPath)
     {
@@ -84,24 +88,86 @@ class Crispus {
 			$sContent = $this->get404Page();
 		}
 		
+		// Pass the contents to the Page controller
+		$sOutput = $this->processPage($sUrl, $sContent);
+		
+		// Render the page
+		$this->renderPage($sOutput);		
     }
+	
+	private function processPage($sUrl, $sContent){
+	
+		$sControllerDir = $this->getConfig('crispus_paths', 'controllers') . '/';
+		
+		// Get the path to this page's controller file
+        $sFilePath =  $sControllerDir . $sUrl;
+        
+        // If this is a directory, we need the index
+		if(is_dir($sFilePath)) {		
+		    $sFilePath = $sControllerDir . $url .'/index'. $this->sControllerExt;
+		}else{
+		    $sFilePath .= $this->sControllerExt;
+	    }
+	    
+	    // Open the file
+	    if(file_exists($sFilePath)){
+			require_once($sFilePath);
+			// Get the correct class name
+			$sControllerName = capitalize(
+								str_replace($this->sControllerExt, '', 
+											last(
+												explode('/' , $sFilePath))))
+								. 'Controller';
+			$this->oCurrentPage = new $sControllerName;
+		} else {
+			require_once($sControllerDir . $this->sDefaultController . '.php');
+			$this->oCurrentPage = new $this->sDefaultController;
+		}	
+		
+		$sContent = $this->oCurrentPage->processPage($sUrl, $sContent);
+		
+		return $sContent;
+	}
+	
+	private function renderPage($sContent){
+		// Ask the page controller which theme and template to render
+		$sCurrentTheme = $this->getConfig('site', 'theme');
+		$sCurrentTemplate = $this->sDefaultTemplate;
+		
+		if(!empty($this->oCurrentPage)){
+			$sCurrentTheme = (empty($this->oCurrentPage->sTheme)) ? $sCurrentTheme : $this->oCurrentPage->sTheme;
+			$sCurrentTemplate = (empty($this->oCurrentPage->sTemplate)) ? $sCurrentTemplate : $this->oCurrentPage->sTemplate;			
+		}else{
+			$sContent = $this->get404Page();
+		}
+		
+		// Pass it through Twig (load the theme)
+		\Twig_Autoloader::register();
+		
+		$oLoader = new \Twig_Loader_Filesystem($this->getConfig('crispus_paths', 'themes').'/' . $sCurrentTheme . '/');
+		
+		// Todo: default twig config + controller options
+		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->getConfig('twig');
+		
+		$oTwig = new \Twig_Environment($oLoader, $aTwigConfig);
+		
+		// Twig variables
+		$aTwigVars = $this->oCurrentPage->aCustomTwigVars + array(
+			'content' => $sContent
+		);
+		
+		$sOutput = $oTwig->render($sCurrentTemplate.'.html', $aTwigVars);
+	
+		echo $sOutput;
+	}
     
-    public function get404Page(){
+    private function get404Page(){
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+		
 		// Settings
-        $sContentDir = $this->getConfig('crispus_paths', 'content') . '/';
-        $sContentExt = '.'.$this->getConfig('crispus', 'content_extension');
         $sNotFoundPage = $this->getConfig('site', 'not_found_page');
         
-        $sFilePath =  $sContentDir . $sNotFoundPage . $sContentExt;
-        
-        if(file_exists($sFilePath)){
-			$sContent = file_get_contents($sFilePath);
-		} else {
-			$sContent = 'Oops, 404 page also not found';
-		}       
-		
-		return $sContent; 
+        return $this->getPage('/'.$sNotFoundPage);
     }
     
     /** 
