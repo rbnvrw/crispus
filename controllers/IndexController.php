@@ -6,15 +6,18 @@ class IndexController {
 	public $sCurrentTemplate;
 	public $aCustomTwigConfig = array();
 	public $aCustomTwigVars = array();
+	public $aJs = array();
+	public $aCss = array();
 	
 	private $sContent;
-	private $oJs;
-	private $oCss;
 
-	public function __construct() {
+	public function __construct(){	    
 		// Initialize assets
-		$oJs = new \Assetic\Asset\AssetCollection();
-		$oCss = new \Assetic\Asset\AssetCollection();
+		$this->aCss = array(
+		    \RubenVerweij\Config::$crispus['urls']['themes'] . 
+		    '/' . \RubenVerweij\Config::$site['theme'] .
+		    '/css/base.css'
+		);
 	}
 	
 	public function processPage($sUrl, $sContent){
@@ -22,14 +25,6 @@ class IndexController {
 		$this->sContent = $this->processMarkdown($sContent);
 	
 		return $this->sContent;
-	}
-	
-	public function getJavascriptAssets() {
-		return $this->oJs;
-	}
-	
-	public function getCSSAssets() {
-		return $this->oCss;
 	}
 	
 	private function processMarkdown($sContent){

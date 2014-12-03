@@ -11,30 +11,15 @@ namespace RubenVerweij;
  */
 class Crispus {
 
-    private static $aConfig = array();
-	private $sDefaultController = 'IndexController';
+    private $sDefaultController = 'IndexController';
 	private $sControllerExt = 'php';
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
 
     public function __construct($sConfigPath)
-    {
-        // Load the configuration
-        $this->setConfigFromFile($sConfigPath);
-        
+    {               
         // Set up router
-        $this->setupRouter();
-        
-        
-    }
-    
-    /**
-    * Set the config from the config file
-    */
-    private function setConfigFromFile($sConfigPath) {
-        if(!empty($sConfigPath)){
-            self::$aConfig = parse_ini_file($sConfigPath, true);
-        }
+        $this->setupRouter();      
     }
     
     /**
@@ -68,8 +53,8 @@ class Crispus {
         }
         
         // Settings
-        $sContentDir = $this->getConfig('crispus_paths', 'content') . '/';
-        $sContentExt = '.'.$this->getConfig('crispus', 'content_extension');
+        $sContentDir = Config::$crispus['paths']['content'] . '/';
+        $sContentExt = '.'.Config::$crispus['content_extension'];
         
         // Get the path to this page's file
         $sFilePath =  $sContentDir . $sUrl;
@@ -97,7 +82,7 @@ class Crispus {
 	
 	private function processPage($sUrl, $sContent){
 	
-		$sControllerDir = $this->getConfig('crispus_paths', 'controllers') . '/';
+		$sControllerDir = Config::$crispus['paths']['controllers'] . '/';
 		
 		// Get the path to this page's controller file
         $sFilePath =  $sControllerDir . $sUrl;
@@ -131,7 +116,7 @@ class Crispus {
 	
 	private function renderPage($sContent){
 		// Ask the page controller which theme and template to render
-		$sCurrentTheme = $this->getConfig('site', 'theme');
+		$sCurrentTheme = Config::$site['theme'];
 		$sCurrentTemplate = $this->sDefaultTemplate;
 		
 		if(!empty($this->oCurrentPage)){
@@ -142,16 +127,14 @@ class Crispus {
 		}
 		
 		// Get all javascript and css assets
-		$sThemePath = $this->getConfig('crispus_paths', 'themes').'/' . $sTheme . '/';
-		$this->oJS = $this->oCurrentPage->getJavascriptAssets();
-		$this->oCSS = $this->oCurrentPage->getCSSAssets();
+		$sThemePath = Config::$crispus['paths']['themes'].'/' . $sCurrentTheme . '/';
 		
 		// Run Twig
-		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->getConfig('twig');
+		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + Config::$twig;
 		$aTwigVars = array(
 			'content' => $sContent,
-			'javascript' => $this->oJS->dump(),
-			'css' => $this->oCSS->dump()
+			'javascript' => $this->getAssetString($this->oCurrentPage->aJs, 'js'),
+			'css' => $this->getAssetString($this->oCurrentPage->aCss, 'css')
 		);
 		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
@@ -160,45 +143,37 @@ class Crispus {
 		// Pass it through Twig (load the theme)
 		\Twig_Autoloader::register();
 		
+		$sThemePath = Config::$crispus['paths']['themes'].'/' . $sTheme . '/';
+		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
 		$oTwig = new \Twig_Environment($oLoader, $aConfig);
 		
 		return $oTwig->render($sTemplate.'.html', $aVars);
 	}
-    
+	
+	private function getAssetString($aAssets, $sType = 'js'){
+	    $sMuneePath = Config::$munee['path'];
+	    $bMinify = Config::$munee['minify'];
+	    
+	    if(!empty($aAssets)){
+	        if($sType == 'js'){
+	            return $sMuneePath . '?files=' . implode(',', $aAssets) . '&minify=' . var_export($bMinify, true);
+	        }else{
+	            return $sMuneePath . '?files=' . implode(',', $aAssets) . '&minify=' . var_export($bMinify, true);
+	        }
+	    }else{
+	        return null;
+	    }	    
+	}
+	    
     private function get404Page(){
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
 		
 		// Settings
-        $sNotFoundPage = $this->getConfig('site', 'not_found_page');
+        $sNotFoundPage = Config::$site['not_found_page'];
         
-        return $this->getPage('/'.$sNotFoundPage);
-    }
-    
-    /** 
-    * Get a config value
-    * Arg: section, value, ...
-    */
-    public static function getConfig(){
-        // Get arguments
-        $aArgs = func_get_args();
-        
-        if(!empty(self::$aConfig) && !empty($aArgs)){
-            $mValue = null;
-            $aConfig = self::$aConfig;
-            
-            // Return the config value
-            foreach($aArgs as $sKey){
-                if(isset($aConfig[$sKey])){
-                    $mValue = $aConfig[$sKey];
-                    $aConfig = $aConfig[$sKey];
-                } 
-            }
-            return $mValue;
-        }else{
-            return null;
-        }
+        return $this->getPage($sNotFoundPage);
     }
 
 }
