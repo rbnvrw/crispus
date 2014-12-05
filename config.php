@@ -65,7 +65,8 @@ class Config {
         
         self::$munee = array(
             'path' => self::$root_url.'lib/Munee.php',
-            'minify' => true
+            'minify' => true,
+            'packer' => true
         );
         
     }

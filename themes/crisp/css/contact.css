@@ -1,0 +1,16 @@
+/*=================================*/
+/* Theme for rubenverweij.nl
+/* By: Ruben Verweij
+/* http://rubenverweij.nl
+/*=================================*/
+
+.rv-contact__intro {
+    min-height: 210px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.contactform {
+	margin: 16px;
+	padding: 16px;
+}

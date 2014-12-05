@@ -12,12 +12,6 @@ class IndexController {
 	private $sContent;
 
 	public function __construct(){	    
-		// Initialize assets
-		$this->aCss = array(
-		    \RubenVerweij\Config::$crispus['urls']['themes'] . 
-		    '/' . \RubenVerweij\Config::$site['theme'] .
-		    '/css/base.css'
-		);
 	}
 	
 	public function processPage($sUrl, $sContent){

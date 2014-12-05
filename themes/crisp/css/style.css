@@ -1,0 +1,131 @@
+/*=================================*/
+/* Theme for rubenverweij.nl
+/* By: Ruben Verweij
+/* http://rubenverweij.nl
+/*=================================*/
+
+body.rv {
+    padding-top: 70px;
+    background-color: #eee;
+}
+
+.rv a {
+    color: #1A8FB4;
+}
+
+.rv a:hover,
+.rv a:focus
+{
+    color: #1A5D7E;
+}
+
+/* Navbar */
+.navbar--rv {
+    background-color: #1A8FB4;
+    border: none;
+    min-height: 70px;
+}
+
+.navbar--rv .navbar-toggle {
+    border-color: #fff;
+}
+
+.navbar--rv .navbar-toggle:hover, .navbar--rv .navbar-toggle:focus {
+    background-color: #62B5D0;
+}
+
+.navbar--rv .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+.navbar--rv .navbar-nav > li > a.navbar__link,
+.navbar--rv > .container-fluid .navbar-brand {
+    color: #ffffff;
+    line-height: 40px;
+}
+
+.navbar--rv .navbar-nav > li > a.navbar__link:hover,
+.navbar--rv .navbar-nav > li > a.navbar__link:focus
+{
+    background-color: #62B5D0;
+}
+
+.rv-icon--round {
+    height: 36px;
+    width: 36px;
+    -moz-border-radius: 18px;
+    border-radius: 18px;
+    background-color: #fff;
+    display: inline-block;
+    line-height: 36px;
+    margin: 16px;
+}
+
+.rv-icon--round .glyphicon {
+    vertical-align: middle;
+    top: -2px;
+}
+
+.rv-icon:hover, .rv-icon:focus {
+    color: #1A8FB4;
+    text-decoration: none;
+}
+
+.rv-material {
+    box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.3);
+}
+
+/* Backgrounds */
+.i-background--lightgrey {
+    background-color: #EEE;
+}
+
+.i-background--white {
+    background-color: #fff;
+}
+
+.i-background--lightgrey .rv-icon--round .glyphicon {
+    color: #EEE;
+}
+
+.i-background--darkblue {
+    background-color: #1A5D7E;
+    color: #ffffff;
+}
+
+.i-background--darkblue .rv-icon--round .glyphicon {
+    color: #1A5D7E;
+}
+
+.i-background--blue {
+    background-color: #1A8FB4;
+    color: #ffffff;
+}
+
+.i-background--blue .rv-icon--round .glyphicon {
+    color: #1A8FB4;
+}
+
+.i-background--lightblue {
+    background-color: #62B5D0;
+    color: #ffffff;
+}
+
+.i-background--lightblue .rv-icon--round .glyphicon {
+    color: #62B5D0;
+}
+
+a.btn--white-bg {
+    color: #fff;
+    border-color: #1A8FB4;
+    background-color: #1A8FB4;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+a.btn--white-bg:hover,
+a.btn--white-bg:focus
+{
+    color: #1A8FB4;
+    background-color: #fff;
+}

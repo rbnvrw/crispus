@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {% spaceless %}
+    <link href="{{- css_prefix -}}
+                {{- theme_path -}}/css/bootstrap.min.css,
+                {{- theme_path -}}/css/style.css,
+                {{- theme_path -}}/css/blog.css,
+                {% if css is not empty %}
+                {% spaceless %}
+                    ,{{- css -}}
+                {% endspaceless %}
+                {% endif %}" rel="stylesheet">
+    {% endspaceless %}
+{% endblock %}
+
+{% block content %}
+	<section class="container-fluid i-background--lightblue rv-blog rv-main">
+
+		<a href="{{ base_url }}/blog" class="rv-icon rv-icon--round rv-material">
+			<span class="glyphicon glyphicon-book"></span>
+		</a>
+
+		{{ content }}
+
+	</section>
+
+    <div class="container-fluid blog-overview">
+	{% for page in pages|reverse %}
+		{% if page.date and page.type == 'blog-post' %}
+		<section class="blog-overview__post rv-material row">
+		    <div class="col-sm-12">
+			    <h3><a href="{{ page.url }}">{{ page.title }}</a></h3>
+			    <p class="blog-overview__post__meta">{{ page.date_formatted }}</p>
+			    <p class="blog-overview__post__excerpt">{{ page.excerpt }}</p>
+			    <p><a href="{{ page.url }}" class="btn btn--white-bg">Lees verder &raquo;</a></p>
+			</div>
+		</section>
+		{% endif %}
+	{% endfor %}
+	</div>
+{% endblock %}

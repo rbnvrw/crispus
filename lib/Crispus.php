@@ -127,14 +127,17 @@ class Crispus {
 		}
 		
 		// Get all javascript and css assets
-		$sThemePath = Config::$crispus['paths']['themes'].'/' . $sCurrentTheme . '/';
+		$sThemePath = Config::$crispus['urls']['themes'].'/' . $sCurrentTheme;
 		
 		// Run Twig
 		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + Config::$twig;
 		$aTwigVars = array(
 			'content' => $sContent,
-			'javascript' => $this->getAssetString($this->oCurrentPage->aJs, 'js'),
-			'css' => $this->getAssetString($this->oCurrentPage->aCss, 'css')
+			'js_prefix' => $this->getAssetString('js'),
+			'css_prefix' => $this->getAssetString('css'),
+			'js' => implode(',', $this->oCurrentPage->aJs),
+			'css' => implode(',', $this->oCurrentPage->aCss),
+			'theme_path' => $sThemePath
 		);
 		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
@@ -152,19 +155,17 @@ class Crispus {
 		return $oTwig->render($sTemplate.'.html', $aVars);
 	}
 	
-	private function getAssetString($aAssets, $sType = 'js'){
+	private function getAssetString($sType = 'js'){
 	    $sMuneePath = Config::$munee['path'];
 	    $bMinify = Config::$munee['minify'];
+	    $bMinify = Config::$munee['packer'];
 	    
-	    if(!empty($aAssets)){
-	        if($sType == 'js'){
-	            return $sMuneePath . '?files=' . implode(',', $aAssets) . '&minify=' . var_export($bMinify, true);
-	        }else{
-	            return $sMuneePath . '?files=' . implode(',', $aAssets) . '&minify=' . var_export($bMinify, true);
-	        }
-	    }else{
-	        return null;
-	    }	    
+	    // First filter params, then file list, so you can append in theme file
+	    if($sType == 'js'){
+            return $sMuneePath . '?packer=' . var_export($bMinify, true) . '&files=';
+        }else{
+            return $sMuneePath . '?minify=' . var_export($bMinify, true) . '&files=';
+        }   
 	}
 	    
     private function get404Page(){
