@@ -15,7 +15,6 @@
     {% block head %}
     {% spaceless %}
     <link href="{{- css_prefix -}}
-                {{- theme_path -}}/css/bootstrap.min.css,
                 {{- theme_path -}}/css/style.css
                 {% if css is not empty %}
                 {% spaceless %}
@@ -27,63 +26,25 @@
     
   </head>
 
-  <body class="rv">
-
-    {% block navbar %}
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top navbar--rv" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only navbar__link">Menu</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="{{ base_url }}"><strong>Ruben</strong>&nbsp;Verweij</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            {% for page in pages %}
-                {% if page.type == 'top-level-page' %}
-				<li><a href="{{ page.url }}" class="navbar__link">{{ page.title }}</a></li>
-				{% endif %}
-			{% endfor %}
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-    {% endblock %}
+  <body>
     
     {% block content %}
-    <div class="rv-main">
+    <div>
         {{ content }}
     </div> <!-- /container -->
     {% endblock %}
 
     {% block footer %}
+    {% if javascript is not empty %}
     {% spaceless %}
     <script src="{{- js_prefix -}}
-                 {{- theme_path -}}/js/jquery-2.1.1.min.js,
-                 {{- theme_path -}}/js/bootstrap.min.js,
-                 {{- theme_path -}}/js/waypoints.js,
-                 {{- theme_path -}}/js/scrolleffects.js
                  {% if javascript is not empty %}
                  {% spaceless %}
                     ,{{- javascript -}}
                  {% endspaceless %}
                  {% endif %}"></script>
     {% endspaceless %}
-	
-	<script>
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-		ga('create', 'UA-56141646-1', 'auto');
-		ga('send', 'pageview');
-	</script>
+    {% endif %}
     {% endblock %}
     
   </body>
