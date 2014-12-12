@@ -16,7 +16,7 @@ class Crispus {
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
 
-    public function __construct($sConfigPath)
+    public function __construct()
     {               
         // Set up router
         $this->setupRouter();      
@@ -135,8 +135,8 @@ class Crispus {
 			'content' => $sContent,
 			'js_prefix' => $this->getAssetString('js'),
 			'css_prefix' => $this->getAssetString('css'),
-			'js' => implode(',', $this->oCurrentPage->aJs),
-			'css' => implode(',', $this->oCurrentPage->aCss),
+			'js' => $this->oCurrentPage->sJs,
+			'css' => $this->oCurrentPage->sCss,
 			'theme_path' => $sThemePath,
 			'custom' => $this->oCurrentPage->aCustomTwigVars,
 			'config' => Config::$site
