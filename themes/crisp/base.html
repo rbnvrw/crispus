@@ -3,15 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if meta.description %}
-	    <meta name="description" content="{{ meta.description }}"> 
+    {% if custom.description %}
+	    <meta name="description" content="{{ custom.description }}"> 
     {% endif %}
-    {% if meta.robots %}
-	    <meta name="robots" content="{{ meta.robots }}">
+    {% if custom.robots %}
+	    <meta name="robots" content="{{ custom.robots }}">
     {% endif %}
-    <meta name="author" content="Ruben Verweij">
-
-    <title>{% if meta.title %}{{ meta.title }} | {% endif %}{{ site_title }}</title>
+    {% if custom.author %}
+	    <meta name="author" content="{{ custom.author }}"> 
+    {% endif %}
+    
+    <title>{% if custom.title %}{{ custom.title }} | {% endif %}{{ config.title }}</title>
     {% block head %}
     {% spaceless %}
     <link href="{{- css_prefix -}}

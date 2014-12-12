@@ -137,7 +137,9 @@ class Crispus {
 			'css_prefix' => $this->getAssetString('css'),
 			'js' => implode(',', $this->oCurrentPage->aJs),
 			'css' => implode(',', $this->oCurrentPage->aCss),
-			'theme_path' => $sThemePath
+			'theme_path' => $sThemePath,
+			'custom' => $this->oCurrentPage->aCustomTwigVars,
+			'config' => Config::$site
 		);
 		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
