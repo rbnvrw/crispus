@@ -18,13 +18,48 @@ class Crispus {
 	private $aPages = array();
 
     public function __construct()
-    {               
-        // Set up router
-        $this->setupRouter();    
-
-		// Get Config instance
-		Config::getInstance();
+    {               	
+		// Set up router
+        $this->setupRouter();    		
     }
+	
+	public static function config() {
+		// Get Config instance
+		$sConfig = '\\Crispus\\Config';
+		if(class_exists('\\Config')){
+			$sConfig = '\\Config';
+		}
+		
+		$sConfig::getInstance();
+		
+		$aArgs = func_get_args();
+		
+		$aResult = array();
+		foreach($aArgs as $sArg){
+			if(empty($aResult)){
+				if(isset($sConfig::$$sArg)){
+					$aResult = $sConfig::$$sArg;
+				}
+			}else{
+				if(isset($aResult[$sArg])){
+					$aResult = $aResult[$sArg];
+				}
+			}
+		}
+		return $aResult;
+	}
+	
+	public static function configMethod($sMethod) {
+		// Get Config instance
+		$sConfig = '\\Crispus\\Config';
+		if(class_exists('\\Config')){
+			$sConfig = '\\Config';
+		}
+		
+		$sConfig::getInstance();
+		
+		return $sConfig::$sMethod();
+	}
     
     /**
     * Set up routing
@@ -57,8 +92,8 @@ class Crispus {
         }
         
         // Settings
-        $sContentDir = Config::$crispus['paths']['content'] . '/';
-        $sContentExt = '.'.Config::$crispus['content_extension'];
+        $sContentDir = self::config('crispus','paths','content') . '/';
+        $sContentExt = '.'.self::config('crispus','content_extension');
         
         // Get the path to this page's file
         $sFilePath =  $sContentDir . $sUrl;
@@ -85,7 +120,7 @@ class Crispus {
     }
 	
 	private function getPageController($sUrl){
-		$sControllerDir = Config::$crispus['paths']['controllers'] . '/';
+		$sControllerDir = self::config('crispus','paths','controllers') . '/';
 		
 		// Get the path to this page's controller file
         $sFilePath =  $sControllerDir . $sUrl;
@@ -125,7 +160,7 @@ class Crispus {
 	
 	private function renderPage($sContent){
 		// Ask the page controller which theme and template to render
-		$sCurrentTheme = Config::$site['theme'];
+		$sCurrentTheme = self::config('site','theme');
 		$sCurrentTemplate = $this->sDefaultTemplate;
 		
 		if(!empty($this->oCurrentPage)){
@@ -136,12 +171,12 @@ class Crispus {
 		}
 		
 		// Get all javascript and css assets
-		$sThemePath = Config::$crispus['urls']['themes'].'/' . $sCurrentTheme;
+		$sThemePath = self::config('crispus','urls','themes').'/' . $sCurrentTheme;
 		
 		// Run Twig
-		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + Config::$twig;
+		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + self::config('twig');
 		$aTwigVars = array(
-			'base_url' => Config::getBaseUrl(),
+			'base_url' => self::configMethod('getBaseUrl'),
 			'content' => $sContent,
 			'js_prefix' => $this->getAssetString('js'),
 			'css_prefix' => $this->getAssetString('css'),
@@ -149,9 +184,9 @@ class Crispus {
 			'css' => $this->oCurrentPage->sCss,
 			'theme_path' => $sThemePath,
 			'page' => $this->oCurrentPage->aCustomTwigVars,
-			'config' => Config::$site,
-			'pages' => $this->getAllPages(Config::$site['menu']['sort_by'], 
-											((strtolower(Config::$site['menu']['sort_order']) == 'asc') ? true : false))
+			'config' => self::config('site'),
+			'pages' => $this->getAllPages(self::config('site','menu','sort_by'), 
+											((strtolower(self::config('site','menu','sort_order')) == 'asc') ? true : false))
 		);
 		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
@@ -160,7 +195,7 @@ class Crispus {
 		// Pass it through Twig (load the theme)
 		\Twig_Autoloader::register();
 		
-		$sThemePath = Config::$crispus['paths']['themes'].'/' . $sTheme . '/';
+		$sThemePath = self::config('crispus','paths','themes').'/' . $sTheme . '/';
 		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
@@ -170,9 +205,9 @@ class Crispus {
 	}
 	
 	private function getAssetString($sType = 'js'){
-	    $sMuneePath = Config::$munee['path'];
-	    $bMinify = Config::$munee['minify'];
-	    $bMinify = Config::$munee['packer'];
+	    $sMuneePath = self::config('munee','path');
+	    $bMinify = self::config('munee','minify');
+	    $bMinify = self::config('munee','packer');
 	    
 	    // First filter params, then file list, so you can append in theme file
 	    if($sType == 'js'){
@@ -185,12 +220,14 @@ class Crispus {
 	private function getAllPages($sSortByHeader = '', $bAsc = true){
 		if(empty($this->aPages)){
 			// Get all pages
-			$aPageFiles = $this->getFiles(Config::$crispus['paths']['content'], Config::$crispus['content_extension']);
+			$sContentPath = self::config('crispus','paths','content');
+			$sContentExt = self::config('crispus','content_extension');
+			$aPageFiles = $this->getFiles($sContentPath, $sContentExt);
 			
 			foreach($aPageFiles as $sPage){
 				// Strip directory and extension
-				$sUrl = str_replace(array(Config::$crispus['paths']['content'], 
-											'.'.Config::$crispus['content_extension']), '', $sPage);
+				$sUrl = str_replace(array($sContentPath, 
+											'.'.$sContentExt), '', $sPage);
 				// Read contents
 				$sContent = '';
 				if(file_exists($sPage)){
@@ -258,9 +295,9 @@ class Crispus {
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
 		
 		// Settings
-        $sUrl = Config::$site['not_found_page'];
-        $sContentDir = Config::$crispus['paths']['content'] . '/';
-        $sContentExt = '.'.Config::$crispus['content_extension'];
+        $sUrl = self::config('site','not_found_page');
+        $sContentDir = self::config('crispus','paths','content') . '/';
+        $sContentExt = '.'.self::config('crispus','content_extension');
         
         // Get the path to this page's file
         $sFilePath =  $sContentDir . $sUrl;

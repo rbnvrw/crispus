@@ -21,7 +21,7 @@ class Config {
     
     public static $munee;
     
-    protected function __construct(){
+    public function __construct(){
         self::$root_url = '';
     
         self::$site = array(

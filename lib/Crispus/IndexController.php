@@ -11,11 +11,12 @@ class IndexController {
 	public $sJs;
 	public $sCss;
 	public $aHeaders = array();
+	private static $oConfig;
 	
 	private $sContent;
 
-	public function __construct(){	    
-		Config::getInstance();
+	public function __construct(){	
+
 	}
 	
 	public function processPage($sUrl, $sContent){
@@ -23,7 +24,7 @@ class IndexController {
 		$this->sContent = $this->processMarkdown($sContent);
 		
 		// Add excerpt
-		$iLength = (isset(Config::$site['excerpt_length'])) ? Config::$site['excerpt_length'] : 150;
+		$iLength = (!empty(Crispus::config('site','excerpt_length'))) ? Crispus::config('site','excerpt_length') : 150;
 		$this->aCustomTwigVars['excerpt'] = $this->excerpt(strip_tags($this->sContent), $iLength);
 		
 		// Get custom headers from top comment, from unprocessed content
@@ -55,8 +56,7 @@ class IndexController {
 	    // Remove comments/meta
 	    $sContent = preg_replace('#/\*.+?\*/#s', '', $sContent);
 	    // Base URL
-	    Config::getInstance();
-	    $sContent = str_replace('%base_url%', Config::$root_url, $sContent);
+	    $sContent = str_replace('%base_url%', Crispus::config('root_url'), $sContent);
 	    
 		return \Michelf\MarkdownExtra::defaultTransform($sContent);
 	}
@@ -87,12 +87,9 @@ class IndexController {
 	}
 	
 	private function setCssJsFromHeaders(){
-	    Config::getInstance();
-	    
-	    $sCssUrl = Config::$crispus['urls']['themes'].'/'.Config::$site['theme'].'/'
-	                        .Config::$site['css_theme_folder'].'/';
-	    $sJsUrl = Config::$crispus['urls']['themes'].'/'.Config::$site['theme'].'/'
-	                        .Config::$site['js_theme_folder'].'/';
+	   	$sThemeUrl = Crispus::config('crispus','urls','themes').'/'.Crispus::config('site','theme');    
+	    $sCssUrl = $sThemeUrl.'/'.Crispus::config('site','css_theme_folder').'/';
+	    $sJsUrl = $sThemeUrl.'/'.Crispus::config('site','js_theme_folder').'/';
 	
 	    if(isset($this->aCustomTwigVars['css'])){
 	        $aCss = explode(',', $this->aCustomTwigVars['css']);
