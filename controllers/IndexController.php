@@ -29,6 +29,15 @@ class IndexController {
 		return $this->sContent;
 	}
 	
+	public function getHeaders($sUrl, $sContent){
+		if(empty($this->aCustomTwigVars)){
+			$this->processPage($sUrl, $sContent);
+			return $this->aCustomTwigVars;
+		}else{
+			return $this->aCustomTwigVars;
+		}
+	}
+	
 	private function processMarkdown($sContent){
 	    // Remove comments/meta
 	    $sContent = preg_replace('#/\*.+?\*/#s', '', $sContent);
@@ -56,7 +65,7 @@ class IndexController {
 	            foreach($aMatches[1] as $iIndex => $sKey){
 	                if(isset($aMatches[2][$iIndex])){
 	                    // Set the values
-	                    $this->aCustomTwigVars[strtolower($sKey)] = $aMatches[2][$iIndex];
+	                    $this->aCustomTwigVars[strtolower($sKey)] = $this->convertHeaderValue($aMatches[2][$iIndex]);
 	                }
 	            }
 	        }
@@ -92,5 +101,19 @@ class IndexController {
 	        unset($this->aCustomTwigVars['js']);
 	    }
 	}
-
+	
+	private function convertHeaderValue($sValue){
+		if(strtolower($sValue) == "true"){
+			// Boolean true
+			$sValue = true;
+		}elseif(strtolower($sValue) == "false"){
+			// Boolean false
+			$sValue = false;
+		}elseif(is_numeric($sValue)){
+			// Numeric
+			$sValue = (float) $sValue;
+		}
+		
+		return $sValue;
+	}
 }

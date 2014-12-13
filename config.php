@@ -29,11 +29,15 @@ class Config {
         self::$root_url = '';
     
         self::$site = array(
-            'title' => 'Ruben Verweij',
-            'theme' => 'rubenverweij',
+            'title' => 'Crispus CMS',
+            'theme' => 'crisp',
             'not_found_page' => '404',
             'css_theme_folder' => 'css',
-            'js_theme_folder' => 'js'
+            'js_theme_folder' => 'js',
+			'menu' => array(
+				'sort_order' => 'asc',
+				'sort_by'	 =>	'sorting'
+			)
         );
         
         self::$twig = array(
@@ -62,11 +66,11 @@ class Config {
                 'plugins' => self::$root_url.'/plugins',
                 'themes' => self::$root_url.'/themes',
                 'vendor' => self::$root_url.'/vendor'
-            ),
+            )
         );
         
         self::$munee = array(
-            'path' => self::$root_url.'lib/Munee.php',
+            'path' => self::$root_url.'/lib/Munee.php',
             'minify' => true,
             'packer' => true
         );

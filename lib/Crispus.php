@@ -15,11 +15,15 @@ class Crispus {
 	private $sControllerExt = 'php';
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
+	private $aPages = array();
 
     public function __construct()
     {               
         // Set up router
-        $this->setupRouter();      
+        $this->setupRouter();    
+
+		// Get Config instance
+		Config::getInstance();
     }
     
     /**
@@ -80,8 +84,7 @@ class Crispus {
 		$this->renderPage($sOutput);		
     }
 	
-	private function processPage($sUrl, $sContent){
-	
+	private function getPageController($sUrl){
 		$sControllerDir = Config::$crispus['paths']['controllers'] . '/';
 		
 		// Get the path to this page's controller file
@@ -103,11 +106,18 @@ class Crispus {
 											last(
 												explode('/' , $sFilePath))))
 								. 'Controller';
-			$this->oCurrentPage = new $sControllerName;
+			$oCurrentPage = new $sControllerName;
 		} else {
 			require_once($sControllerDir . $this->sDefaultController . '.php');
-			$this->oCurrentPage = new $this->sDefaultController;
-		}	
+			$oCurrentPage = new $this->sDefaultController;
+		}
+		
+		return $oCurrentPage;
+	}
+	
+	private function processPage($sUrl, $sContent){
+	
+		$this->oCurrentPage = $this->getPageController($sUrl);
 		
 		$sContent = $this->oCurrentPage->processPage($sUrl, $sContent);
 		
@@ -139,7 +149,9 @@ class Crispus {
 			'css' => $this->oCurrentPage->sCss,
 			'theme_path' => $sThemePath,
 			'custom' => $this->oCurrentPage->aCustomTwigVars,
-			'config' => Config::$site
+			'config' => Config::$site,
+			'pages' => $this->getAllPages(Config::$site['menu']['sort_by'], 
+											((strtolower(Config::$site['menu']['sort_order']) == 'asc') ? true : false))
 		);
 		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
@@ -168,6 +180,74 @@ class Crispus {
         }else{
             return $sMuneePath . '?minify=' . var_export($bMinify, true) . '&files=';
         }   
+	}
+	
+	private function getAllPages($sSortByHeader = '', $bAsc = true){
+		if(empty($this->aPages)){
+			// Get all pages
+			$aPageFiles = $this->getFiles(Config::$crispus['paths']['content'], Config::$crispus['content_extension']);
+			
+			foreach($aPageFiles as $sPage){
+				// Strip directory and extension
+				$sUrl = str_replace(array(Config::$crispus['paths']['content'], 
+											'.'.Config::$crispus['content_extension']), '', $sPage);
+				// Read contents
+				$sContent = '';
+				if(file_exists($sPage)){
+					$sContent = file_get_contents($sPage);
+				} else {
+					break;
+				}
+											
+				// Get page controller
+				$oPage = $this->getPageController($sUrl);
+				
+				$aHeaders = $oPage->getHeaders($sUrl, $sContent);
+				
+				$this->aPages[] = array('url' => $sUrl, 'headers' => $aHeaders);
+			}
+					
+			if(!empty($sSortByHeader)){
+				$aSortArray = array();
+				foreach ($this->aPages as $sKey => $aPage){
+					$aSortArray[$sKey] = (isset($aPage['headers'][$sSortByHeader])) ? $aPage['headers'][$sSortByHeader] : '';
+				}
+				
+				$iOrder = ($bAsc) ? SORT_ASC : SORT_DESC;
+				
+				array_multisort($aSortArray, $iOrder, $this->aPages);	
+			}
+			
+			return $this->aPages;
+		}else{
+			return $this->aPages;
+		}
+	}
+	
+	/**
+	 * Helper function to recusively get all files in a directory
+	 *
+	 * @param string $directory start directory
+	 * @param string $ext optional limit to file extensions
+	 * @return array the matched files
+	 */ 
+	protected function getFiles($sDirectory, $sExt = '')
+	{
+	    $aFiles = array();
+	    if($oHandle = opendir($sDirectory)){
+	        while(false !== ($oFile = readdir($oHandle))){
+	            if(preg_match("/^(^\.)/", $oFile) === 0){
+	                if(is_dir($sDirectory. "/" . $oFile)){
+	                    $aFiles = array_merge($aFiles, $this->getFiles($sDirectory. "/" . $oFile, $sExt));
+	                } else {
+	                    $oFile = $sDirectory . "/" . $oFile;
+	                    if(!$sExt || strstr($oFile, $sExt)) $aFiles[] = preg_replace("/\/\//si", "/", $oFile);
+	                }
+	            }
+	        }
+	        closedir($oHandle);
+	    }
+	    return $aFiles;
 	}
 	    
     private function get404Page(){
