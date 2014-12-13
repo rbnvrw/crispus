@@ -15,13 +15,26 @@ class IndexController {
 	private $sContent;
 
 	public function __construct(){	    
+		Config::getInstance();
 	}
 	
 	public function processPage($sUrl, $sContent){
-		// Get custom headers from top comment
+		// Process Markdown
+		$this->sContent = $this->processMarkdown($sContent);
+		
+		// Add excerpt
+		$iLength = (isset(Config::$site['excerpt_length'])) ? Config::$site['excerpt_length'] : 150;
+		$this->aCustomTwigVars['excerpt'] = $this->excerpt(strip_tags($this->sContent), $iLength);
+		
+		// Get custom headers from top comment, from unprocessed content
 		$this->aHeaders = $this->processHeaders($sContent);
 		
 		$this->setCssJsFromHeaders();
+		
+		// Set template
+		if(isset($this->aCustomTwigVars['template'])){
+			$this->sTemplate = $this->aCustomTwigVars['template'];
+		}
 		
 		// Process Markdown
 		$this->sContent = $this->processMarkdown($sContent);
@@ -115,5 +128,20 @@ class IndexController {
 		}
 		
 		return $sValue;
+	}
+	
+	/**
+	 * Helper function to limit the words in a string
+	 *
+	 * @param string $string the given string
+	 * @param int $word_limit the number of words to limit to
+	 * @return string the limited string
+	 */ 
+	private function excerpt($sString, $iLimit)
+	{
+		$aWords = explode(' ', $sString);
+		$sExcerpt = trim(implode(' ', array_splice($aWords, 0, $iLimit)));
+		if(count($aWords) > $iLimit) $sExcerpt .= '&hellip;';
+		return $sExcerpt;
 	}
 }

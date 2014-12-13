@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% if custom.description %}
-	    <meta name="description" content="{{ custom.description }}"> 
+    {% if page.description %}
+	    <meta name="description" content="{{ page.description }}"> 
     {% endif %}
-    {% if custom.robots %}
-	    <meta name="robots" content="{{ custom.robots }}">
+    {% if page.robots %}
+	    <meta name="robots" content="{{ page.robots }}">
     {% endif %}
-    {% if custom.author %}
-	    <meta name="author" content="{{ custom.author }}"> 
+    {% if page.author %}
+	    <meta name="author" content="{{ page.author }}"> 
     {% endif %}
     
-    <title>{% if custom.title %}{{ custom.title }} | {% endif %}{{ config.title }}</title>
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ config.title }}</title>
     {% block head %}
     {%- spaceless -%}
     <link href="{{- css_prefix -}}
@@ -35,7 +35,7 @@
 			{% if pages is not empty %}
 				<ul>
 					{% for page in pages %}
-						{% if page.headers.menu is not defined or page.headers.menu != false %}
+						{% if page.headers.menu == true %}
 							<li><a href="{{ page.url }}">{{ page.headers.title }}</a></li>
 						{% endif %}
 					{% endfor %}
@@ -51,16 +51,14 @@
     {% endblock %}
 
     {% block footer %}
-    {% if javascript is not empty %}
-    {% spaceless %}
+    {%- spaceless -%}
     <script src="{{- js_prefix -}}
-                 {% if javascript is not empty %}
-                 {% spaceless %}
-                    ,{{- javascript -}}
-                 {% endspaceless %}
-                 {% endif %}"></script>
-    {% endspaceless %}
-    {% endif %}
+                 {%- if js is not empty -%}
+                 {%- spaceless -%}
+                    ,{{- js -}}
+                 {%- endspaceless -%}
+                 {%- endif -%}"></script>
+    {%- endspaceless -%}
     {% endblock %}
     
   </body>

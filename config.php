@@ -34,6 +34,7 @@ class Config {
             'not_found_page' => '404',
             'css_theme_folder' => 'css',
             'js_theme_folder' => 'js',
+			'excerpt_length' => 150,
 			'menu' => array(
 				'sort_order' => 'asc',
 				'sort_by'	 =>	'sorting'

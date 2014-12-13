@@ -148,7 +148,7 @@ class Crispus {
 			'js' => $this->oCurrentPage->sJs,
 			'css' => $this->oCurrentPage->sCss,
 			'theme_path' => $sThemePath,
-			'custom' => $this->oCurrentPage->aCustomTwigVars,
+			'page' => $this->oCurrentPage->aCustomTwigVars,
 			'config' => Config::$site,
 			'pages' => $this->getAllPages(Config::$site['menu']['sort_by'], 
 											((strtolower(Config::$site['menu']['sort_order']) == 'asc') ? true : false))
