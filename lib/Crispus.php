@@ -65,7 +65,7 @@ class Crispus {
         
         // If this is a directory, we need the index
 		if(is_dir($sFilePath)) {		
-		    $sFilePath = $sContentDir . $url .'/index'. $sContentExt;
+		    $sFilePath = $sContentDir . $sUrl .'/index'. $sContentExt;
 		}else{
 		    $sFilePath .= $sContentExt;
 	    }
@@ -142,6 +142,7 @@ class Crispus {
 		// Run Twig
 		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + Config::$twig;
 		$aTwigVars = array(
+			'base_url' => Config::getBaseUrl(),
 			'content' => $sContent,
 			'js_prefix' => $this->getAssetString('js'),
 			'css_prefix' => $this->getAssetString('css'),
@@ -204,7 +205,7 @@ class Crispus {
 				
 				$aHeaders = $oPage->getHeaders($sUrl, $sContent);
 				
-				$this->aPages[] = array('url' => $sUrl, 'headers' => $aHeaders);
+				$this->aPages[] = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
 			}
 					
 			if(!empty($sSortByHeader)){
@@ -248,6 +249,10 @@ class Crispus {
 	        closedir($oHandle);
 	    }
 	    return $aFiles;
+	}
+	
+	private function formatUrl($sUrl){
+		return preg_replace('#/index#i', '', $sUrl);
 	}
 	    
     private function get404Page(){

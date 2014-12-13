@@ -85,6 +85,25 @@ class Config {
         
         return self::$_instance;      
     }
+	
+	public static function getBaseUrl(){
+		if(!empty(self::$root_url)){
+			return self::$root_url;
+		}
+		
+		$sUrl = '';
+		$sRequestUrl = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
+		$sScriptUrl  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
+		if($sRequestUrl != $sScriptUrl){
+			$sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $sScriptUrl)) .'/', '', $sRequestUrl, 1), '/');
+		}
+
+		$sProtocol = 'http';
+		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
+			$sProtocol = 'https';
+		}
+		return rtrim(str_replace($sUrl, '', $sProtocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']), '/');
+	}
 }
 
 // Initialize config
