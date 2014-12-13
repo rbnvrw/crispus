@@ -1,5 +1,5 @@
 <?php
-namespace RubenVerweij;
+namespace Crispus;
 
 /**
  * Crispus CMS
@@ -11,7 +11,7 @@ namespace RubenVerweij;
  */
 class Crispus {
 
-    private $sDefaultController = 'IndexController';
+    private $sDefaultController = 'Crispus\IndexController';
 	private $sControllerExt = 'php';
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
@@ -92,7 +92,7 @@ class Crispus {
         
         // If this is a directory, we need the index
 		if(is_dir($sFilePath)) {		
-		    $sFilePath = $sControllerDir . $url .'/index'. $this->sControllerExt;
+		    $sFilePath = $sControllerDir . $sUrl .'/index'. $this->sControllerExt;
 		}else{
 		    $sFilePath .= $this->sControllerExt;
 	    }
@@ -108,7 +108,6 @@ class Crispus {
 								. 'Controller';
 			$oCurrentPage = new $sControllerName;
 		} else {
-			require_once($sControllerDir . $this->sDefaultController . '.php');
 			$oCurrentPage = new $this->sDefaultController;
 		}
 		
@@ -259,9 +258,32 @@ class Crispus {
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
 		
 		// Settings
-        $sNotFoundPage = Config::$site['not_found_page'];
+        $sUrl = Config::$site['not_found_page'];
+        $sContentDir = Config::$crispus['paths']['content'] . '/';
+        $sContentExt = '.'.Config::$crispus['content_extension'];
         
-        return $this->getPage($sNotFoundPage);
+        // Get the path to this page's file
+        $sFilePath =  $sContentDir . $sUrl;
+        
+        // If this is a directory, we need the index
+		if(is_dir($sFilePath)) {		
+		    $sFilePath = $sContentDir . $sUrl .'/index'. $sContentExt;
+		}else{
+		    $sFilePath .= $sContentExt;
+	    }
+	    
+	    // Open the file
+	    if(file_exists($sFilePath)){
+			$sContent = file_get_contents($sFilePath);
+		} else {
+			$sContent = "# Page not found";
+		}
+		
+		// Pass the contents to the Page controller
+		$sOutput = $this->processPage($sUrl, $sContent);
+		
+		// Render the page
+		$this->renderPage($sOutput);
     }
 
 }

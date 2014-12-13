@@ -17,6 +17,8 @@
 		"meenie/Munee": "*"
     },
     "autoload": {
-        "files": ["config.php", "lib/Crispus.php"]
+        "psr-0" : {
+            "Crispus" : "lib/"
+        }
     }
 }
