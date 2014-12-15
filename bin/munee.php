@@ -1,6 +1,6 @@
 <?php
 
-define('WEBROOT', realpath(dirname(__FILE__)) .'/../');
+define('WEBROOT', realpath(dirname(__FILE__)) .'/../../../../');
 
 require_once(WEBROOT.'vendor/autoload.php');
 
