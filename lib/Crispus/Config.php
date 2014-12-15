@@ -56,8 +56,14 @@ class Config {
     }
     
     public static function getInstance(){
-        if(!(self::$_instance instanceof Config)){
-            self::$_instance = new Config();
+        if(!(self::$_instance instanceof \Config)){
+            if(!(self::$_instance instanceof \Crispus\Config)){
+                if(class_exists('\\Config')){
+                    self::$_instance = new \Config();
+                }elseif(class_exists('\\Crispus\\Config')){
+                    self::$_instance = new \Crispus\Config();
+                }
+            }
         }  
         
         return self::$_instance;      
@@ -121,7 +127,7 @@ class Config {
                 'vendor' => self::$root_url.'/vendor'
             );
 			
-		self::$munee['path'] = self::$crispus['urls']['bin'].'/Munee.php';
+		self::$munee['path'] = self::$crispus['urls']['bin'].'/munee.php';
 			
 	}
 }
