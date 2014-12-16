@@ -129,17 +129,16 @@ class Crispus {
 		if(is_dir($sFilePath)) {		
 		    $sFilePath = $sControllerDir . $sUrl .'/index'. $this->sControllerExt;
 		}else{
-		    $sFilePath .= $this->sControllerExt;
+		    $sFilePath .= '.'.$this->sControllerExt;
 	    }
 	    
 	    // Open the file
 	    if(file_exists($sFilePath)){
 			require_once($sFilePath);
 			// Get the correct class name
-			$sControllerName = capitalize(
-								str_replace($this->sControllerExt, '', 
-											last(
-												explode('/' , $sFilePath))))
+			$aParts = explode('/' , $sFilePath);
+			$sLast = end($aParts);
+			$sControllerName = ucfirst(str_replace('.'.$this->sControllerExt, '', $sLast))
 								. 'Controller';
 			$oCurrentPage = new $sControllerName;
 		} else {
@@ -206,14 +205,14 @@ class Crispus {
 	
 	private function getAssetString($sType = 'js'){
 	    $sMuneePath = self::config('munee','path');
-	    $bMinify = self::config('munee','minify');
-	    $bMinify = self::config('munee','packer');
+	    $bMinify = var_export(self::config('munee','minify'), true);
+	    $bPacker = var_export(self::config('munee','packer'), true);
 	    
 	    // First filter params, then file list, so you can append in theme file
 	    if($sType == 'js'){
-            return $sMuneePath . '?packer=' . var_export($bMinify, true) . '&files=';
+            return $sMuneePath . '?packer=' . $bPacker . '&files=';
         }else{
-            return $sMuneePath . '?minify=' . var_export($bMinify, true) . '&files=';
+            return $sMuneePath . '?minify=' . $bMinify . '&files=';
         }   
 	}
 	
