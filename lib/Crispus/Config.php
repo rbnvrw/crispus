@@ -90,11 +90,10 @@ class Config {
 	
 	protected static function setPathsAndUrls(){
 		
-		// Set site root path
-		if(!defined('ROOT_PATH') || empty(ROOT_PATH)){
+		// Set site root path      
+        self::$root_path = constant('ROOT_PATH');
+        if(empty(self::$root_path)){
             self::$root_path = realpath(dirname(__FILE__));
-        }else{
-            self::$root_path = ROOT_PATH;
         }
 		
 		// Set crispus root path & url

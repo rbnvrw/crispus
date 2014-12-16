@@ -24,7 +24,8 @@ class IndexController {
 		$this->sContent = $this->processMarkdown($sContent);
 		
 		// Add excerpt
-		$iLength = (!empty(Crispus::config('site','excerpt_length'))) ? Crispus::config('site','excerpt_length') : 150;
+		$iLength = Crispus::config('site','excerpt_length');
+		$iLength = (!empty($iLength)) ? $iLength : 150;
 		$this->aCustomTwigVars['excerpt'] = $this->excerpt(strip_tags($this->sContent), $iLength);
 		
 		// Get custom headers from top comment, from unprocessed content
