@@ -114,6 +114,8 @@ class IndexController {
 	}
 	
 	private function convertHeaderValue($sValue){
+	    $sValue = str_replace('%base_url%', Crispus::config('root_url'), $sValue);
+	
 		if(strtolower($sValue) == "true"){
 			// Boolean true
 			$sValue = true;
