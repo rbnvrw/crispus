@@ -34,7 +34,8 @@ class Config {
 			'menu' => array(
 				'sort_order' => 'asc',
 				'sort_by'	 =>	'sorting'
-			)
+			),
+			'render_content_page_list' => false
         );
         
         self::$twig = array(

@@ -80,7 +80,7 @@ class Crispus {
 		}	
 		
 		// Now that we now the relative URL, serve the page
-		$this->getPage($sUrl);
+		echo $this->getPage($sUrl);
     }
     
     /**
@@ -116,7 +116,7 @@ class Crispus {
 		$sOutput = $this->processPage($sUrl, $sContent);
 		
 		// Render the page
-		$this->renderPage($sOutput);		
+		return $this->renderPage($sOutput);		
     }
 	
 	private function getPageController($sUrl){
@@ -185,9 +185,10 @@ class Crispus {
 			'page' => $this->oCurrentPage->aCustomTwigVars,
 			'config' => self::config('site'),
 			'pages' => $this->getAllPages(self::config('site','menu','sort_by'), 
-											((strtolower(self::config('site','menu','sort_order')) == 'asc') ? true : false))
+										((strtolower(self::config('site','menu','sort_order')) == 'asc') ? true : false),
+										self::config('site', 'render_content_page_list'))
 		);
-		echo $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
+		return $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
 	
 	private function runTwig($sTheme, $sTemplate, $aConfig, $aVars){
@@ -216,7 +217,7 @@ class Crispus {
         }   
 	}
 	
-	private function getAllPages($sSortByHeader = '', $bAsc = true){
+	private function getAllPages($sSortByHeader = '', $bAsc = true, $bRenderContent = false){
 		if(empty($this->aPages)){
 			// Get all pages
 			$sContentPath = self::config('crispus','paths','content');
@@ -240,7 +241,15 @@ class Crispus {
 				
 				$aHeaders = $oPage->getHeaders($sUrl, $sContent);
 				
-				$this->aPages[] = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
+				if($bRenderContent){
+				    $sPageContent = $oPage->processPage($sUrl, $sContent);
+				    $this->aPages[] = array('url' => $this->formatUrl($sUrl), 
+				                            'headers' => $aHeaders,
+				                            'content' => $sPageContent);
+				}else{
+				    $this->aPages[] = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
+				}
+				
 			}
 					
 			if(!empty($sSortByHeader)){
