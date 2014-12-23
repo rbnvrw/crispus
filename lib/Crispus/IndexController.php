@@ -58,8 +58,10 @@ class IndexController {
 	    $sContent = preg_replace('#/\*.+?\*/#s', '', $sContent);
 	    // Base URL
 	    $sContent = str_replace('%base_url%', Crispus::config('root_url'), $sContent);
+	    // Markdown
+	    $sContent = \Michelf\MarkdownExtra::defaultTransform($sContent);
 	    
-		return \Michelf\MarkdownExtra::defaultTransform($sContent);
+		return trim($sContent);
 	}
 	
 	private function processHeaders($sContent){
