@@ -16,9 +16,25 @@ class Crispus {
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
 	private $aPages = array();
+	
+	private $sRequestUri;
+	private $sPathToSelf;
+	private $sServerProtocol;
 
-    public function __construct()
-    {               	
+    public function __construct($sRequestUri = '', $sPathToSelf = '', $sServerProtocol = '')
+    {            
+        // Set up parameters
+        if(empty($sRequestUri)){
+            $this->sRequestUri = $_SERVER['REQUEST_URI'];
+        }   
+        
+        if(empty($sPathToSelf)){
+            $this->sPathToSelf = $_SERVER['PHP_SELF'];
+        }  
+        
+        if(empty($sServerProtocol)){
+            $this->sServerProtocol = $_SERVER['SERVER_PROTOCOL'];
+        }  	
 		// Set up router
         $this->setupRouter();    		
     }
@@ -68,15 +84,12 @@ class Crispus {
         // Get request url and script url
 		$sUrl = '';
 		
-		$sRequestUrl = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
-		$sScriptUrl  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
-
 		// Get our url path and trim the / of the left and the right
-		if($sRequestUrl != $sScriptUrl){
-		    $sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $sScriptUrl)) .'/', '', $sRequestUrl, 1), '/');
+		if($this->sRequestUri != $this->sPathToSelf){
+		    $sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $this->sPathToSelf)) .'/', '', $this->sRequestUri, 1), '/');
 		    $sUrl = preg_replace('/\?.*/', '', $sUrl); // Strip query string
 		}else{
-		    $sUrl = $sRequestUrl;
+		    $sUrl = $this->sRequestUri;
 		}	
 		
 		// Now that we now the relative URL, serve the page
@@ -300,7 +313,7 @@ class Crispus {
 	}
 	    
     private function get404Page(){
-        header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
+        header($this->sServerProtocol.' 404 Not Found');
 		
 		// Settings
         $sUrl = self::config('site','not_found_page');
