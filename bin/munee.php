@@ -5,4 +5,4 @@ define('MUNEE_CACHE', WEBROOT.'data/cache');
 
 require_once(WEBROOT.'vendor/autoload.php');
 
-echo \Munee\Dispatcher::run(new \Munee\Request());
+echo \Munee\Dispatcher::run(new \Munee\Request(array('image' => array('checkReferrer' => false))));
