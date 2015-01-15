@@ -28,7 +28,7 @@ class Crispus {
     {            
         // Set up parameters
         if(empty($sRootPath)){
-            $this->sRootPath = realpath('../../'.dirname(__FILE__));
+            $this->sRootPath = realpath(dirname(__FILE__).'/../../');
         }else{
             $this->sRootPath = $sRootPath;
         } 

@@ -29,7 +29,7 @@ class Config {
     public function __construct($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sHttpHost = '', $sProtocol = 'http'){
         
         if(empty($sRootPath)){
-            self::$root_path = realpath('../../'.dirname(__FILE__));
+            self::$root_path = realpath(dirname(__FILE__).'/../../');
         }else{
             self::$root_path = $sRootPath;
         } 
