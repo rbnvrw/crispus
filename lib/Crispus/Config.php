@@ -21,7 +21,48 @@ class Config {
     
     public static $munee;
     
-    public function __construct(){
+    private static $sRequestUri;
+	private static $sPathToSelf;
+	private static $sHttpHost;
+	private static $sProtocol;
+    
+    public function __construct($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sHttpHost = '', $sProtocol = 'http'){
+        
+        if(empty($sRootPath)){
+            self::$root_path = realpath('../../'.dirname(__FILE__));
+        }else{
+            self::$root_path = $sRootPath;
+        } 
+        
+        // Set up parameters
+        if(empty($sRequestUri)){
+            self::$sRequestUri = $_SERVER['REQUEST_URI'];
+        }else{
+            self::$sRequestUri = $sRequestUri;
+        }   
+        
+        if(empty($sPathToSelf)){
+            self::$sPathToSelf = $_SERVER['PHP_SELF'];
+        }else{
+            self::$sPathToSelf = $sPathToSelf;
+        }  
+        
+        if(empty($sHttpHost)){
+            self::$sHttpHost = $_SERVER['HTTP_HOST'];
+        }else{
+            self::$sHttpHost = $sHttpHost;
+        }
+        
+        if(empty($sProtocol)){
+            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
+		        self::$sProtocol = 'https';
+	        }else{
+	            self::$sProtocol = 'http';
+	        }
+        }else{
+            self::$sProtocol = $sProtocol;
+        }
+        
         self::$root_url = '';
     
         self::$site = array(
@@ -56,13 +97,13 @@ class Config {
         
     }
     
-    public static function getInstance(){
-        if(!(self::$_instance instanceof \Config)){
+    public static function getInstance($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sHttpHost = '', $sProtocol = 'http'){
+        if(!(self::$_instance instanceof \Config)){           
             if(!(self::$_instance instanceof \Crispus\Config)){
                 if(class_exists('\\Config')){
-                    self::$_instance = new \Config();
+                    self::$_instance = new \Config($sRootPath, $sRequestUri, $sPathToSelf, $sHttpHost, $sProtocol);
                 }elseif(class_exists('\\Crispus\\Config')){
-                    self::$_instance = new \Crispus\Config();
+                    self::$_instance = new \Crispus\Config($sRootPath, $sRequestUri, $sPathToSelf, $sHttpHost, $sProtocol);
                 }
             }
         }  
@@ -76,26 +117,14 @@ class Config {
 		}
 		
 		$sUrl = '';
-		$sRequestUrl = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
-		$sScriptUrl  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
-		if($sRequestUrl != $sScriptUrl){
-			$sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $sScriptUrl)) .'/', '', $sRequestUrl, 1), '/');
+		if(self::$sRequestUri != self::$sPathToSelf){
+			$sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', self::$sPathToSelf)) .'/', '', self::$sRequestUri, 1), '/');
 		}
 
-		$sProtocol = 'http';
-		if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
-			$sProtocol = 'https';
-		}
-		return rtrim(str_replace($sUrl, '', $sProtocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']), '/');
+		return rtrim(str_replace($sUrl, '', self::$sProtocol . "://" . self::$sHttpHost . self::$sRequestUri), '/');
 	}
 	
 	protected static function setPathsAndUrls(){
-		
-		// Set site root path      
-        self::$root_path = constant('ROOT_PATH');
-        if(empty(self::$root_path)){
-            self::$root_path = realpath(dirname(__FILE__));
-        }
 		
 		// Set crispus root path & url
 		self::$crispus_path = self::$root_path . '/vendor/rbnvrw/crispus';

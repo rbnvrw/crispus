@@ -15,10 +15,13 @@ class CrispusTest extends PHPUnit_Framework_TestCase
         unset($this->oCrispus);
     }
     
+    /**
+     * @runInSeparateProcess
+     */
     public function testRenderPage(){
-        $this->oCrispus = new Crispus\Crispus('/index');
+        $this->oCrispus = new Crispus\Crispus('/home/ruben/Development/GitHub/crispus/', 'index', '', 'HTTP/1.1', 'rubenverweij.nl');
         
         // Expect a non-empty body
-        $this->expectOutputRegex('/<body>[^<]*[^<\s][^<]*<\/body>/imx');
+        $this->expectOutputRegex('/\<body.*(?=\>)>((.)+)(?=\<\/body>)/sU');
     }
 }
