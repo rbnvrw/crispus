@@ -1,4 +1,15 @@
 Crispus CMS
-======
+========================================
+[![Build Status](https://travis-ci.org/rbnvrw/crispus.svg?branch=master)](https://travis-ci.org/rbnvrw/crispus)
 
 Crispus CMS is a light-weight file based content management system
+
+Installation / Usage
+--------------------
+Installing Crispus CMS is easy: just add it as a dependency of your project via Composer:
+```
+"require": {
+  "rbnvrw/crispus": "dev-master"
+}
+```
+Then use `composer update` to install Crispus CMS.
