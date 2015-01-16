@@ -369,11 +369,7 @@ class Crispus {
 			$sContent = "# Page not found";
 		}
 		
-		// Pass the contents to the Page controller
-		$sOutput = $this->processPage($sUrl, $sContent);
-		
-		// Render the page
-		return $this->renderPage($sOutput);
+		return $sContent;
     }
 
 }
