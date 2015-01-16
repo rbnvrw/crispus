@@ -1,6 +1,11 @@
 Crispus CMS
 ========================================
 [![Build Status](https://travis-ci.org/rbnvrw/crispus.svg?branch=master)](https://travis-ci.org/rbnvrw/crispus)
+[![Coverage Status](https://coveralls.io/repos/rbnvrw/crispus/badge.svg)](https://coveralls.io/r/rbnvrw/crispus)
+[![Latest Stable Version](https://poser.pugx.org/rbnvrw/crispus/v/stable.svg)](https://packagist.org/packages/rbnvrw/crispus) 
+[![Total Downloads](https://poser.pugx.org/rbnvrw/crispus/downloads.svg)](https://packagist.org/packages/rbnvrw/crispus) 
+[![Latest Unstable Version](https://poser.pugx.org/rbnvrw/crispus/v/unstable.svg)](https://packagist.org/packages/rbnvrw/crispus) 
+[![License](https://poser.pugx.org/rbnvrw/crispus/license.svg)](https://packagist.org/packages/rbnvrw/crispus)
 
 Crispus CMS is a light-weight file based content management system
 
