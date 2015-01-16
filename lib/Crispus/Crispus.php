@@ -10,119 +10,37 @@ namespace Crispus;
  * @version 0.1
  */
 class Crispus {
+	private $oConfig;
 
     private $sDefaultController = 'Crispus\IndexController';
 	private $sControllerExt = 'php';
 	private $oCurrentPage;
 	private $sDefaultTemplate = 'index';
 	private $aPages = array();
-	
-	private $sRootPath;
-	private $sRequestUri;
-	private $sPathToSelf;
-	private $sServerProtocol;
-	private $sHttpHost;
-	private $sProtocol;
 
-    public function __construct($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sServerProtocol = '', $sHttpHost = '', $sProtocol = 'http')
+    public function __construct($sConfigFile = '../../config/config.json')
     {            
-        // Set up parameters
-        if(empty($sRootPath)){
-            $this->sRootPath = realpath(dirname(__FILE__).'/../../');
-        }else{
-            $this->sRootPath = $sRootPath;
-        } 
-        
-        if(empty($sRequestUri)){
-            $this->sRequestUri = filter_input(INPUT_SERVER, 'REQUEST_URI');
-        }else{
-            $this->sRequestUri = $sRequestUri;
-        }   
-        
-        if(empty($sPathToSelf)){
-            $this->sPathToSelf = filter_input(INPUT_SERVER, 'PHP_SELF');
-        }else{
-            $this->sPathToSelf = $sPathToSelf;
-        }  
-        
-        if(empty($sServerProtocol)){
-            $this->sServerProtocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
-        }else{
-            $this->sServerProtocol = $sServerProtocol;
-        }  	
-        
-        if(empty($sHttpHost)){
-            $this->sHttpHost = filter_input(INPUT_SERVER, 'HTTP_HOST');
-        }else{
-            $this->sHttpHost = $sHttpHost;
-        }
-        
-        if(empty($sProtocol)){
-            $sHttps = filter_input(INPUT_SERVER, 'HTTPS');
-            if($sHttps != 'off'){
-		        $this->sProtocol = 'https';
-	        }else{
-	            $this->sProtocol = 'http';
-	        }
-        }else{
-            $this->sProtocol = $sProtocol;
-        }
+        $this->oConfig = new \Crispus\Config($sConfigFile);
         
 		// Set up router
         $this->setupRouter();    		
     }
-	
-	public function config() {
-		// Get Config instance
-		$sConfig = '\\Crispus\\Config';
-		if(class_exists('\\Config')){
-			$sConfig = '\\Config';
-		}
-		
-		$sConfig::getInstance($this->sRootPath, $this->sRequestUri, $this->sPathToSelf, $this->sHttpHost, $this->sProtocol);
-		
-		$aArgs = func_get_args();
-		
-		$aResult = array();
-		foreach($aArgs as $sArg){
-			if(empty($aResult)){
-				if(isset($sConfig::$$sArg)){
-					$aResult = $sConfig::$$sArg;
-				}
-			}else{
-				if(isset($aResult[$sArg])){
-					$aResult = $aResult[$sArg];
-				}
-			}
-		}
-		return $aResult;
-	}
-	
-	public function configMethod($sMethod) {
-		// Get Config instance
-		$sConfig = '\\Crispus\\Config';
-		if(class_exists('\\Config')){
-			$sConfig = '\\Config';
-		}
-		
-		$sConfig::getInstance($this->sRootPath, $this->sRequestUri, $this->sPathToSelf, $this->sHttpHost, $this->sProtocol);
-		
-		return $sConfig::$sMethod();
-	}
-    
+	    
     /**
     * Set up routing
     */
     private function setupRouter(){
         // Get request url and script url
 		$sUrl = '';
+		$sRequestUri = $this->oConfig::get('request_uri');
+		$sScriptPath = $this->oConfig::get('script_path');
 		
 		// Get our url path and trim the / of the left and the right
-		if($this->sRequestUri != $this->sPathToSelf){
-		    $sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $this->sPathToSelf)) .'/', '', $this->sRequestUri, 1), '/');
+		if($sRequestUri != $sScriptPath){
+		    $sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $sScriptPath)) .'/', '', $sRequestUri, 1), '/');
 		    $sUrl = preg_replace('/\?.*/', '', $sUrl); // Strip query string
 		}else{
-		    $sUrl = $this->sRequestUri;
+		    $sUrl = $sRequestUri;
 		}	
 		
 		// Now that we now the relative URL, serve the page
@@ -138,8 +56,8 @@ class Crispus {
         }
         
         // Settings
-        $sContentDir = $this->config('crispus','paths','content') . '/';
-        $sContentExt = '.'.$this->config('crispus','content_extension');
+        $sContentDir = $this->oConfig::getPath('content') . '/';
+        $sContentExt = '.'.$this->oConfig::get('crispus','content_extension');
         
         // Get the path to this page's file
         $sFilePath =  $sContentDir . $sUrl;
@@ -166,7 +84,7 @@ class Crispus {
     }
 	
 	private function getPageController($sUrl){
-		$sControllerDir = $this->config('crispus','paths','controllers') . '/';
+		$sControllerDir = $this->oConfig::getPath('controllers') . '/';
 		
 		// Get the path to this page's controller file
         $sFilePath =  $sControllerDir . $sUrl;
@@ -205,7 +123,7 @@ class Crispus {
 	
 	private function renderPage($sContent){
 		// Ask the page controller which theme and template to render
-		$sCurrentTheme = $this->config('site','theme');
+		$sCurrentTheme = $this->oConfig::get('site','theme');
 		$sCurrentTemplate = $this->sDefaultTemplate;
 		
 		if(!empty($this->oCurrentPage)){
@@ -216,12 +134,12 @@ class Crispus {
 		}
 		
 		// Get all javascript and css assets
-		$sThemePath = $this->config('crispus','urls','themes').'/' . $sCurrentTheme;
+		$sThemePath = $this->oConfig::get('crispus','urls','themes').'/' . $sCurrentTheme;
 		
 		// Run Twig
-		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->config('twig');
+		$aTwigConfig = $this->oCurrentPage->aCustomTwigConfig + $this->oConfig::get('twig');
 		$aTwigVars = array(
-			'base_url' => $this->configMethod('getBaseUrl'),
+			'base_url' => $this->oConfig::getMethod('getBaseUrl'),
 			'content' => $sContent,
 			'js_prefix' => $this->getAssetString('js'),
 			'css_prefix' => $this->getAssetString('css'),
@@ -229,10 +147,10 @@ class Crispus {
 			'css' => $this->oCurrentPage->sCss,
 			'theme_path' => $sThemePath,
 			'page' => $this->oCurrentPage->aCustomTwigVars,
-			'config' => $this->config('site'),
-			'pages' => $this->getAllPages($this->config('site','menu','sort_by'), 
-										((strtolower($this->config('site','menu','sort_order')) == 'asc') ? true : false),
-										$this->config('site', 'render_content_page_list'))
+			'config' => $this->oConfig::get('site'),
+			'pages' => $this->getAllPages($this->oConfig::get('site','menu','sort_by'), 
+										((strtolower($this->oConfig::get('site','menu','sort_order')) == 'asc') ? true : false),
+										$this->oConfig::get('site', 'render_content_page_list'))
 		);
 		return $this->runTwig($sCurrentTheme, $sCurrentTemplate, $aTwigConfig, $aTwigVars);
 	}
@@ -241,7 +159,7 @@ class Crispus {
 		// Pass it through Twig (load the theme)
 		\Twig_Autoloader::register();
 		
-		$sThemePath = $this->config('crispus','paths','themes').'/' . $sTheme . '/';
+		$sThemePath = $this->oConfig::get('crispus','paths','themes').'/' . $sTheme . '/';
 		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
@@ -251,9 +169,9 @@ class Crispus {
 	}
 	
 	private function getAssetString($sType = 'js'){
-	    $sMuneePath = $this->config('munee','path');
-	    $bMinify = var_export($this->config('munee','minify'), true);
-	    $bPacker = var_export($this->config('munee','packer'), true);
+	    $sMuneePath = $this->oConfig::get('munee','path');
+	    $bMinify = var_export($this->oConfig::get('munee','minify'), true);
+	    $bPacker = var_export($this->oConfig::get('munee','packer'), true);
 	    
 	    // First filter params, then file list, so you can append in theme file
 	    if($sType == 'js'){
@@ -266,8 +184,8 @@ class Crispus {
 	private function getAllPages($sSortByHeader = '', $bAsc = true, $bRenderContent = false){
 		if(empty($this->aPages)){
 			// Get all pages
-			$sContentPath = $this->config('crispus','paths','content');
-			$sContentExt = $this->config('crispus','content_extension');
+			$sContentPath = $this->oConfig::get('crispus','paths','content');
+			$sContentExt = $this->oConfig::get('crispus','content_extension');
 			$aPageFiles = $this->getFiles($sContentPath, $sContentExt);
 			
 			foreach($aPageFiles as $sPage){
@@ -349,9 +267,9 @@ class Crispus {
         header($this->sServerProtocol.' 404 Not Found');
 		
 		// Settings
-        $sUrl = $this->config('site','not_found_page');
-        $sContentDir = $this->config('crispus','paths','content') . '/';
-        $sContentExt = '.'.$this->config('crispus','content_extension');
+        $sUrl = $this->oConfig::get('site','not_found_page');
+        $sContentDir = $this->oConfig::get('crispus','paths','content') . '/';
+        $sContentExt = '.'.$this->oConfig::get('crispus','content_extension');
         
         // Get the path to this page's file
         $sFilePath =  $sContentDir . $sUrl;

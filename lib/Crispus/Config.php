@@ -6,158 +6,83 @@ namespace Crispus;
 class Config {
 
     public static $_instance;
+	private static $_aConfig;
+	    
+    public function __construct($sConfigFile = '../../config/config.json'){
+               
+		if(file_exists($sConfigFile)){
+			$sConfig = file_get_contents($sConfigFile);
+		} else {
+			throw new Exception("Config file doesn't exist: ".$sConfigFile);
+		}
+		
+		self::$_aConfig = json_decode($json_data, true);
+		
+		self::setup();
+        
+    }
 	
-	public static $crispus_path;
-	public static $crispus_url;
-
-    public static $root_path;    
-    public static $root_url;
-    
-    public static $site;
-    
-    public static $twig;
-    
-    public static $crispus;
-    
-    public static $munee;
-    
-    private static $sRequestUri;
-	private static $sPathToSelf;
-	private static $sHttpHost;
-	private static $sProtocol;
-    
-    public function __construct($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sHttpHost = '', $sProtocol = 'http'){
-        
-        if(empty($sRootPath)){
-            self::$root_path = realpath(dirname(__FILE__).'/../../');
-        }else{
-            self::$root_path = $sRootPath;
-        } 
-        
-        // Set up parameters
-        if(empty($sRequestUri)){
-            self::$sRequestUri = filter_input(INPUT_SERVER, 'REQUEST_URI');
-        }else{
-            self::$sRequestUri = $sRequestUri;
-        }   
-        
-        if(empty($sPathToSelf)){
-            self::$sPathToSelf = filter_input(INPUT_SERVER, 'PHP_SELF');
-        }else{
-            self::$sPathToSelf = $sPathToSelf;
-        }  
-        
-        if(empty($sHttpHost)){
-            self::$sHttpHost = filter_input(INPUT_SERVER, 'HTTP_HOST');
-        }else{
-            self::$sHttpHost = $sHttpHost;
+	public static function setup() {
+		// Set up parameters
+        if(!isset(self::$_aConfig['crispus']['paths']['root']) || empty(self::$_aConfig['crispus']['paths']['root'])){
+            self::$_aConfig['crispus']['paths']['root'] = realpath(dirname(__FILE__).'/../../');
         }
         
-        if(empty($sProtocol)){
-			$sHttps = filter_input(INPUT_SERVER, 'HTTPS');
+        if(!isset(self::$_aConfig['request_uri']) || empty(self::$_aConfig['request_uri'])){
+            self::$_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI');
+        }
+        
+        if(!isset(self::$_aConfig['script_path']) || empty(self::$_aConfig['script_path'])){
+            self::$_aConfig['script_path'] = filter_input(INPUT_SERVER, 'PHP_SELF');
+        }
+        
+        if(!isset(self::$_aConfig['server_protocol']) || empty(self::$_aConfig['server_protocol'])){
+            self::$_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
+        }
+        
+        if(!isset(self::$_aConfig['http_host']) || empty(self::$_aConfig['http_host'])){
+            self::$_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST');
+        }
+        
+        if(!isset(self::$_aConfig['protocol']) || empty(self::$_aConfig['protocol'])){
+            $sHttps = filter_input(INPUT_SERVER, 'HTTPS');
             if($sHttps != 'off'){
-		        self::$sProtocol = 'https';
+		        self::$_aConfig['protocol'] = 'https';
 	        }else{
-	            self::$sProtocol = 'http';
+	            self::$_aConfig['protocol'] = 'http';
 	        }
-        }else{
-            self::$sProtocol = $sProtocol;
         }
-        
-        self::$root_url = '';
-    
-        self::$site = array(
-            'title' => 'Crispus CMS',
-            'theme' => 'crisp',
-            'not_found_page' => '404',
-            'css_theme_folder' => 'css',
-            'js_theme_folder' => 'js',
-			'excerpt_length' => 150,
-			'menu' => array(
-				'sort_order' => 'asc',
-				'sort_by'	 =>	'sorting'
-			),
-			'render_content_page_list' => false
-        );
-        
-        self::$twig = array(
-            'cache' => false,
-            'autoescape' => false
-        );
-        
-        self::$crispus = array(
-            'content_extension' => 'md'
-        );
-        
-        self::$munee = array(
-            'minify' => true,
-            'packer' => true
-        );
-		
-		self::setPathsAndUrls();
-        
-    }
-    
-    public static function getInstance($sRootPath = '', $sRequestUri = '', $sPathToSelf = '', $sHttpHost = '', $sProtocol = 'http'){
-        if(!(self::$_instance instanceof \Config)){           
-            if(!(self::$_instance instanceof \Crispus\Config)){
-                if(class_exists('\\Config')){
-                    self::$_instance = new \Config($sRootPath, $sRequestUri, $sPathToSelf, $sHttpHost, $sProtocol);
-                }elseif(class_exists('\\Crispus\\Config')){
-                    self::$_instance = new \Crispus\Config($sRootPath, $sRequestUri, $sPathToSelf, $sHttpHost, $sProtocol);
-                }
-            }
-        }  
-        
-        return self::$_instance;      
-    }
-	
-	public static function getBaseUrl(){
-		if(!empty(self::$root_url)){
-			return self::$root_url;
-		}
-		
-		$sUrl = '';
-		if(self::$sRequestUri != self::$sPathToSelf){
-			$sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', self::$sPathToSelf)) .'/', '', self::$sRequestUri, 1), '/');
-		}
-
-		return rtrim(str_replace($sUrl, '', self::$sProtocol . "://" . self::$sHttpHost . self::$sRequestUri), '/');
 	}
 	
-	protected static function setPathsAndUrls(){
+	public static function get(){	
+		$aArgs = func_get_args();
 		
-		// Set crispus root path & url
-		self::$crispus_path = self::$root_path . '/vendor/rbnvrw/crispus';
-		self::$crispus_url = self::$root_url . '/vendor/rbnvrw/crispus';
-		
-		self::$crispus['paths'] = 
-		array(
-                'bin'	=> self::$crispus_path.'/bin',
-				'cache' => self::$root_path.'/data/cache',
-                'content' => self::$root_path.'/content',
-                'controllers' => self::$root_path.'/controllers',
-                'data' => self::$root_path.'/data',
-                'lib' => self::$crispus_path.'/lib',
-                'plugins' => self::$root_path.'/plugins',
-                'themes' => self::$root_path.'/themes',
-                'vendor' => self::$root_path.'/vendor'
-            );
-			
-		self::$crispus['urls'] = 
-		array(
-                'bin'	=> self::$crispus_url.'/bin',
-				'cache' => self::$root_url.'/data/cache',
-                'content' => self::$root_url.'/content',
-                'controllers' => self::$root_url.'/controllers',
-                'data' => self::$root_url.'/data',
-                'lib' => self::$crispus_url.'/lib',
-                'plugins' => self::$root_url.'/plugins',
-                'themes' => self::$root_url.'/themes',
-                'vendor' => self::$root_url.'/vendor'
-            );
-			
-		self::$munee['path'] = self::$crispus['urls']['bin'].'/munee.php';
-			
+		$aResult = array();
+		foreach($aArgs as $sArg){
+			if(empty($aResult)){
+				if(isset(self::$_aConfig[$sArg])){
+					$aResult = self::$_aConfig[$sArg];
+				}
+			}else{
+				if(isset($aResult[$sArg])){
+					$aResult = $aResult[$sArg];
+				}
+			}
+		}
+		return $aResult;	
 	}
+	
+	public static function getPath($sKey, $sGroup = 'crispus'){
+		$sRoot = '';
+		if(isset(self::$_aConfig['crispus']['paths']['root'])){
+			$sRoot = self::$_aConfig['crispus']['paths']['root'];
+		}
+	
+		if(isset(self::$_aConfig[$sGroup]['paths'][$sKey])){
+			return $sRoot.self::$_aConfig[$sGroup]['paths'][$sKey];
+		}
+		
+		return $sRoot;
+	}
+	
 }

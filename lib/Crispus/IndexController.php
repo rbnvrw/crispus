@@ -18,6 +18,7 @@ class IndexController {
 
 	public function __construct($oCrispus){	
         $this->oCrispus = $oCrispus;
+		$this->oConfig = $oCrispus->oConfig;
 	}
 	
 	public function processPage($sUrl, $sContent){
@@ -25,7 +26,7 @@ class IndexController {
 		$this->sContent = $this->processMarkdown($sContent);
 		
 		// Add excerpt
-		$iLength = $this->oCrispus->config('site','excerpt_length');
+		$iLength = $this->oConfig::get('site','excerpt_length');
 		$iLength = (!empty($iLength)) ? $iLength : 150;
 		$this->aCustomTwigVars['excerpt'] = $this->excerpt(strip_tags($this->sContent), $iLength);
 		
@@ -58,7 +59,7 @@ class IndexController {
 	    // Remove comments/meta
 	    $sContent = preg_replace('#/\*.+?\*/#s', '', $sContent);
 	    // Base URL
-	    $sContent = str_replace('%base_url%', $this->oCrispus->config('root_url'), $sContent);
+	    $sContent = str_replace('%base_url%', $this->oConfig::get('root_url'), $sContent);
 	    // Markdown
 	    $sContent = \Michelf\MarkdownExtra::defaultTransform($sContent);
 	    
@@ -91,9 +92,9 @@ class IndexController {
 	}
 	
 	private function setCssJsFromHeaders(){
-	   	$sThemeUrl = $this->oCrispus->config('crispus','urls','themes').'/'.$this->oCrispus->config('site','theme');    
-	    $sCssUrl = $sThemeUrl.'/'.$this->oCrispus->config('site','css_theme_folder').'/';
-	    $sJsUrl = $sThemeUrl.'/'.$this->oCrispus->config('site','js_theme_folder').'/';
+	   	$sThemeUrl = $this->oConfig::get('crispus','urls','themes').'/'.$this->oConfig::get('site','theme');    
+	    $sCssUrl = $sThemeUrl.'/'.$this->oConfig::get('site','css_theme_folder').'/';
+	    $sJsUrl = $sThemeUrl.'/'.$this->oConfig::get('site','js_theme_folder').'/';
 	
 	    if(isset($this->aCustomTwigVars['css'])){
 	        $aCss = explode(',', $this->aCustomTwigVars['css']);
@@ -117,7 +118,7 @@ class IndexController {
 	}
 	
 	private function convertHeaderValue($sValue){
-	    $sValue = str_replace('%base_url%', $this->oCrispus->config('root_url'), $sValue);
+	    $sValue = str_replace('%base_url%', $this->oConfig::get('root_url'), $sValue);
 	
 		if(strtolower($sValue) == "true"){
 			// Boolean true
