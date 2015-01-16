@@ -5,4 +5,4 @@ php:
   - "5.3"
 install: composer install 
 after_script:
- - php vendor/bin/coveralls -v
+ - CODECLIMATE_REPO_TOKEN=c90dee0d721ab47cfeb09ee92584161818106f195251efbd09dd524186097a58 ./vendor/bin/test-reporter
