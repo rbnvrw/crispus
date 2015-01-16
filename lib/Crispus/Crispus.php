@@ -34,31 +34,32 @@ class Crispus {
         } 
         
         if(empty($sRequestUri)){
-            $this->sRequestUri = $_SERVER['REQUEST_URI'];
+            $this->sRequestUri = filter_input(INPUT_SERVER, 'REQUEST_URI');
         }else{
             $this->sRequestUri = $sRequestUri;
         }   
         
         if(empty($sPathToSelf)){
-            $this->sPathToSelf = $_SERVER['PHP_SELF'];
+            $this->sPathToSelf = filter_input(INPUT_SERVER, 'PHP_SELF');
         }else{
             $this->sPathToSelf = $sPathToSelf;
         }  
         
         if(empty($sServerProtocol)){
-            $this->sServerProtocol = $_SERVER['SERVER_PROTOCOL'];
+            $this->sServerProtocol = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
         }else{
             $this->sServerProtocol = $sServerProtocol;
         }  	
         
         if(empty($sHttpHost)){
-            $this->sHttpHost = $_SERVER['HTTP_HOST'];
+            $this->sHttpHost = filter_input(INPUT_SERVER, 'HTTP_HOST');
         }else{
             $this->sHttpHost = $sHttpHost;
         }
         
         if(empty($sProtocol)){
-            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
+            $sHttps = filter_input(INPUT_SERVER, 'HTTPS');
+            if($sHttps != 'off'){
 		        $this->sProtocol = 'https';
 	        }else{
 	            $this->sProtocol = 'http';

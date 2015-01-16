@@ -36,25 +36,26 @@ class Config {
         
         // Set up parameters
         if(empty($sRequestUri)){
-            self::$sRequestUri = $_SERVER['REQUEST_URI'];
+            self::$sRequestUri = filter_input(INPUT_SERVER, 'REQUEST_URI');
         }else{
             self::$sRequestUri = $sRequestUri;
         }   
         
         if(empty($sPathToSelf)){
-            self::$sPathToSelf = $_SERVER['PHP_SELF'];
+            self::$sPathToSelf = filter_input(INPUT_SERVER, 'PHP_SELF');
         }else{
             self::$sPathToSelf = $sPathToSelf;
         }  
         
         if(empty($sHttpHost)){
-            self::$sHttpHost = $_SERVER['HTTP_HOST'];
+            self::$sHttpHost = filter_input(INPUT_SERVER, 'HTTP_HOST');
         }else{
             self::$sHttpHost = $sHttpHost;
         }
         
         if(empty($sProtocol)){
-            if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off'){
+			$sHttps = filter_input(INPUT_SERVER, 'HTTPS');
+            if($sHttps != 'off'){
 		        self::$sProtocol = 'https';
 	        }else{
 	            self::$sProtocol = 'http';
