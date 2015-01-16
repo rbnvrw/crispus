@@ -373,7 +373,7 @@ class Crispus {
 		$sOutput = $this->processPage($sUrl, $sContent);
 		
 		// Render the page
-		$this->renderPage($sOutput);
+		return $this->renderPage($sOutput);
     }
 
 }
