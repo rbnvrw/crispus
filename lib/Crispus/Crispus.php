@@ -50,24 +50,9 @@ class Crispus {
             $sUrl = 'index';
         }
         
-        // Settings
-        $sContentDir = $this->_oConfig->getPath('content') . '/';
-        $sContentExt = '.'.$this->_oConfig->get('crispus','content_extension');
-        
-        // Get the path to this page's file
-        $sFilePath =  $sContentDir . $sUrl;
-        
-        // If this is a directory, we need the index
-		if(is_dir($sFilePath)) {		
-		    $sFilePath = $sContentDir . $sUrl .'/index'. $sContentExt;
-		}else{
-		    $sFilePath .= $sContentExt;
-	    }
-	    
-	    // Open the file
-	    if(file_exists($sFilePath)){
-			$sContent = file_get_contents($sFilePath);
-		} else {
+        $sContent = $this->getPageFileContents($sUrl);
+
+		if(empty($sContent)){
 			$sContent = $this->get404Page();
 		}
 		
@@ -165,8 +150,8 @@ class Crispus {
 	
 	private function getAssetString($sType = 'js'){
 	    $sMuneePath = $this->_oConfig->getPath('bin', 'munee');
-	    $bMinify = var_export($this->_oConfig->get('munee','minify'), true);
-	    $bPacker = var_export($this->_oConfig->get('munee','packer'), true);
+	    $bMinify = ($this->_oConfig->get('munee','minify')) ? 'true' : 'false';
+	    $bPacker = ($this->_oConfig->get('munee','packer')) ? 'true' : 'false';
 	    
 	    // First filter params, then file list, so you can append in theme file
 	    if($sType == 'js'){
@@ -214,14 +199,9 @@ class Crispus {
 		// Strip directory and extension
 		$sUrl = str_replace(array($sContentPath, 
 									'.'.$sContentExt), '', $sPage);
-		// Read contents
-		$sContent = '';
-		if(file_exists($sPage)){
-			$sContent = file_get_contents($sPage);
-		} else {
-			return null;
-		}
-									
+		
+		$sContent = $this->getFileContents($sPage);
+		
 		// Get page controller
 		$oPage = $this->getPageController($sUrl);
 		
@@ -239,6 +219,33 @@ class Crispus {
 		}
 		
 		return $aPage;
+	}
+	
+	private function getFileContents($sPath) {
+		// Read contents
+		if(file_exists($sPath)){
+			return file_get_contents($sPath);
+		} 
+		
+		return null;		
+	}
+	
+	private function getPageFileContents($sUrl){      
+		$sContentDir = $this->_oConfig->getPath('content') . '/';
+        $sContentExt = '.'.$this->_oConfig->get('crispus','content_extension');
+		
+		// Get the path to this page's file
+        $sFilePath =  $sContentDir . $sUrl;
+	
+        // If this is a directory, we need the index
+		if(is_dir($sFilePath)) {		
+		    $sFilePath = $sContentDir . $sUrl .'/index'. $sContentExt;
+		}else{
+		    $sFilePath .= $sContentExt;
+	    }
+	    
+	    // Open the file		
+		return $this->getFileContents($sFilePath);
 	}
 	
 	/**
@@ -276,24 +283,11 @@ class Crispus {
 		
 		// Settings
         $sUrl = $this->_oConfig->get('site','not_found_page');
-        $sContentDir = $this->_oConfig->getPath('content') . '/';
-        $sContentExt = '.'.$this->_oConfig->get('crispus','content_extension');
         
-        // Get the path to this page's file
-        $sFilePath =  $sContentDir . $sUrl;
-        
-        // If this is a directory, we need the index
-		if(is_dir($sFilePath)) {		
-		    $sFilePath = $sContentDir . $sUrl .'/index'. $sContentExt;
-		}else{
-		    $sFilePath .= $sContentExt;
-	    }
-	    
-	    // Open the file
-	    if(file_exists($sFilePath)){
-			$sContent = file_get_contents($sFilePath);
-		} else {
-			$sContent = "# Page not found";
+        $sContent = $this->getPageFileContents($sUrl);
+
+		if(empty($sContent)){
+			$sContent = '# Page not found';
 		}
 		
 		return $sContent;
