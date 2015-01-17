@@ -179,35 +179,10 @@ class Crispus {
 	private function getAllPages($sSortByHeader = '', $bAsc = true, $bRenderContent = false){
 		if(empty($this->aPages)){
 			// Get all pages
-			$sContentPath = $this->_oConfig->getPath('content');
-			$sContentExt = $this->_oConfig->get('crispus','content_extension');
 			$aPageFiles = $this->getFiles($sContentPath, $sContentExt);
 			
 			foreach($aPageFiles as $sPage){
-				// Strip directory and extension
-				$sUrl = str_replace(array($sContentPath, 
-											'.'.$sContentExt), '', $sPage);
-				// Read contents
-				$sContent = '';
-				if(file_exists($sPage)){
-					$sContent = file_get_contents($sPage);
-				} else {
-					break;
-				}
-											
-				// Get page controller
-				$oPage = $this->getPageController($sUrl);
 				
-				$aHeaders = $oPage->getHeaders($sUrl, $sContent);
-				
-				if($bRenderContent){
-				    $sPageContent = $oPage->processPage($sUrl, $sContent);
-				    $this->aPages[] = array('url' => $this->formatUrl($sUrl), 
-				                            'headers' => $aHeaders,
-				                            'content' => $sPageContent);
-				}else{
-				    $this->aPages[] = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
-				}
 				
 			}
 					
@@ -221,11 +196,43 @@ class Crispus {
 				
 				array_multisort($aSortArray, $iOrder, $this->aPages);	
 			}
-			
-			return $this->aPages;
-		}else{
-			return $this->aPages;
 		}
+		
+		return $this->aPages;
+	}
+	
+	private function getPageForPageArray($sPage, $bRenderContent = false) {
+		$sContentPath = $this->_oConfig->getPath('content');
+		$sContentExt = $this->_oConfig->get('crispus','content_extension');
+	
+		// Strip directory and extension
+		$sUrl = str_replace(array($sContentPath, 
+									'.'.$sContentExt), '', $sPage);
+		// Read contents
+		$sContent = '';
+		if(file_exists($sPage)){
+			$sContent = file_get_contents($sPage);
+		} else {
+			return null;
+		}
+									
+		// Get page controller
+		$oPage = $this->getPageController($sUrl);
+		
+		$aHeaders = $oPage->getHeaders($sUrl, $sContent);
+		
+		$aPage = null;
+		
+		if($bRenderContent){
+			$sPageContent = $oPage->processPage($sUrl, $sContent);
+			$aPage = array('url' => $this->formatUrl($sUrl), 
+									'headers' => $aHeaders,
+									'content' => $sPageContent);
+		}else{
+			$aPage = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
+		}
+		
+		return $aPage;
 	}
 	
 	/**

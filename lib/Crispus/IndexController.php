@@ -90,29 +90,30 @@ class IndexController {
 	}
 	
 	private function setCssJsFromHeaders(){
-	   	$sThemeUrl = $this->oCrispus->_oConfig->getUrl('themes').'/'.$this->oCrispus->_oConfig->get('site','theme');    
-	    $sCssUrl = $sThemeUrl.'/'.$this->oCrispus->_oConfig->get('site','css_theme_folder').'/';
-	    $sJsUrl = $sThemeUrl.'/'.$this->oCrispus->_oConfig->get('site','js_theme_folder').'/';
+	   	    
+	   	$this->sJs = $this->makeAssetString('js');
+		$this->sCss = $this->makeAssetString('css');
+			    
+		unset($this->aCustomTwigVars['js']);
+		unset($this->aCustomTwigVars['css']);
+	}
 	
-	    if(isset($this->aCustomTwigVars['css'])){
-	        $aCss = explode(',', $this->aCustomTwigVars['css']);
-	        $sCss = '';
-	        foreach($aCss as $sSheet){
-	            $sCss .= $sCssUrl . trim($sSheet) . ',';
+	private function makeAssetString($sType){
+		$sThemeUrl = $this->oCrispus->_oConfig->getUrl('themes').'/'.$this->oCrispus->_oConfig->get('site','theme');
+		
+		$sUrl = $sThemeUrl.'/'.$this->oCrispus->_oConfig->get('site', $sType.'_theme_folder').'/';
+		
+		if(isset($this->aCustomTwigVars[$sType])){
+	        $aAsset = explode(',', $this->aCustomTwigVars[$sType]);
+	        $sAsset = '';
+	        foreach($aAsset as $sSheet){
+	            $sAsset .= $sUrl . trim($sSheet) . ',';
 	        }
-	        $this->sCss = rtrim($sCss, ', ');
-	        unset($this->aCustomTwigVars['css']);
+	        	        
+			return rtrim($sAsset, ', ');
 	    }
-	    
-	    if(isset($this->aCustomTwigVars['js'])){
-	        $aJs = explode(',', $this->aCustomTwigVars['js']);
-	        $sJs = '';
-	        foreach($aJs as $sSheet){
-	            $sJs .= $sJsUrl . trim($sSheet) . ',';
-	        }
-	        $this->sJs = rtrim($sJs, ', ');
-	        unset($this->aCustomTwigVars['js']);
-	    }
+		
+		return '';
 	}
 	
 	private function convertHeaderValue($sValue){
