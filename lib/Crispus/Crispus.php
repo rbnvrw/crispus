@@ -179,11 +179,17 @@ class Crispus {
 	private function getAllPages($sSortByHeader = '', $bAsc = true, $bRenderContent = false){
 		if(empty($this->aPages)){
 			// Get all pages
+			$sContentPath = $this->_oConfig->getPath('content');
+			$sContentExt = $this->_oConfig->get('crispus','content_extension');
+			
 			$aPageFiles = $this->getFiles($sContentPath, $sContentExt);
 			
 			foreach($aPageFiles as $sPage){
+				$aPage = $this->getPageForPageArray($sPage, $bRenderContent);
 				
-				
+				if(!empty($aPage)){
+					$this->aPages[] = $aPage;
+				}
 			}
 					
 			if(!empty($sSortByHeader)){
