@@ -4,7 +4,7 @@ Crispus CMS
 [![Code Climate](https://codeclimate.com/github/rbnvrw/crispus/badges/gpa.svg)](https://codeclimate.com/github/rbnvrw/crispus)
 [![Test Coverage](https://codeclimate.com/github/rbnvrw/crispus/badges/coverage.svg)](https://codeclimate.com/github/rbnvrw/crispus)
 
-Crispus CMS is a light-weight file based content management system
+Crispus CMS is a light-weight file based content management system.
 
 Installation / Usage
 --------------------
