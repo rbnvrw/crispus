@@ -5,4 +5,7 @@ php:
   - "5.3"
 install: composer install 
 after_script:
- - CODECLIMATE_REPO_TOKEN=c90dee0d721ab47cfeb09ee92584161818106f195251efbd09dd524186097a58 ./vendor/bin/test-reporter
+ - vendor/bin/test-reporter
+addons:
+  code_climate:
+    repo_token: "c90dee0d721ab47cfeb09ee92584161818106f195251efbd09dd524186097a58"

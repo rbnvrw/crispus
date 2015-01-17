@@ -21,36 +21,32 @@ class Config {
         
     }
 	
-	public function setup() {
+	private function setup() {
 		// Set up parameters
-        if(!isset($this->_aConfig['crispus']['paths']['root']) || empty($this->_aConfig['crispus']['paths']['root'])){
-            $this->_aConfig['crispus']['paths']['root'] = realpath(__DIR__.'/../../');
-        }
+        	
+		$this->_aConfig['crispus']['paths']['root'] = (isset($this->_aConfig['crispus']['paths']['root'])) ? $this->_aConfig['crispus']['paths']['root'] : realpath(__DIR__.'/../../');
         
-        if(!isset($this->_aConfig['request_uri']) || empty($this->_aConfig['request_uri'])){
-            $this->_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
-        }
-        
-        if(!isset($this->_aConfig['server_protocol']) || empty($this->_aConfig['server_protocol'])){
-            $this->_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL', FILTER_SANITIZE_STRING);
-        }
-        
-        if(!isset($this->_aConfig['http_host']) || empty($this->_aConfig['http_host'])){
-            $this->_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
-        }
-        
-        if(!isset($this->_aConfig['protocol']) || empty($this->_aConfig['protocol'])){
-            $sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
+        $this->_aConfig['request_uri'] = (isset($this->_aConfig['request_uri'])) ? $this->_aConfig['request_uri'] : filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
+                
+        $this->_aConfig['server_protocol'] = (isset($this->_aConfig['server_protocol'])) ? $this->_aConfig['server_protocol'] : filter_input(INPUT_SERVER, 'SERVER_PROTOCOL', FILTER_SANITIZE_STRING);
+                
+        $this->_aConfig['http_host'] = (isset($this->_aConfig['http_host'])) ? $this->_aConfig['http_host'] : filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
+		
+		$this->_aConfig['site']['base_url'] = (isset($this->_aConfig['site']['base_url'])) ? $this->_aConfig['site']['base_url'] : '/';
+                
+        $this->getProtocol();
+	}
+	
+	public function getProtocol() {
+		if(!isset($this->_aConfig['protocol'])){
+			$sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
             if($sHttps != 'off'){
 		        $this->_aConfig['protocol'] = 'https';
 	        }else{
 	            $this->_aConfig['protocol'] = 'http';
 	        }
-        }
-		
-		if(!isset($this->_aConfig['site']['base_url']) || empty($this->_aConfig['site']['base_url'])){
-			$this->_aConfig['site']['base_url'] = '/';
 		}
+		return $this->_aConfig['protocol'];
 	}
 	
 	public function get(){	
