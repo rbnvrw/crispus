@@ -33,15 +33,10 @@ class Crispus {
         // Get request url and script url
 		$sUrl = '';
 		$sRequestUri = $this->_oConfig->get('request_uri');
-		$sScriptPath = $this->_oConfig->get('script_path');
 		
 		// Get our url path and trim the / of the left and the right
-		if($sRequestUri != $sScriptPath){
-		    $sUrl = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $sScriptPath)) .'/', '', $sRequestUri, 1), '/');
-		    $sUrl = preg_replace('/\?.*/', '', $sUrl); // Strip query string
-		}else{
-		    $sUrl = $sRequestUri;
-		}	
+		$sUrl = trim($sRequestUri, '/');
+		$sUrl = preg_replace('/\?.*/', '', $sUrl); // Strip query string	
 		
 		// Now that we now the relative URL, serve the page
 		echo $this->getPage($sUrl);
@@ -264,7 +259,7 @@ class Crispus {
 	}
 	    
     private function get404Page(){
-        header($this->sServerProtocol.' 404 Not Found');
+        header($this->_oConfig->get('server_protocol').' 404 Not Found');
 		
 		// Settings
         $sUrl = $this->_oConfig->get('site','not_found_page');

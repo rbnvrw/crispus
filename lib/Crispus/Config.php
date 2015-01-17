@@ -24,27 +24,23 @@ class Config {
 	public function setup() {
 		// Set up parameters
         if(!isset($this->_aConfig['crispus']['paths']['root']) || empty($this->_aConfig['crispus']['paths']['root'])){
-            $this->_aConfig['crispus']['paths']['root'] = realpath(dirname(__FILE__).'/../../');
+            $this->_aConfig['crispus']['paths']['root'] = realpath(__DIR__.'/../../');
         }
         
         if(!isset($this->_aConfig['request_uri']) || empty($this->_aConfig['request_uri'])){
-            $this->_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI');
-        }
-        
-        if(!isset($this->_aConfig['script_path']) || empty($this->_aConfig['script_path'])){
-            $this->_aConfig['script_path'] = filter_input(INPUT_SERVER, 'PHP_SELF');
+            $this->_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
         }
         
         if(!isset($this->_aConfig['server_protocol']) || empty($this->_aConfig['server_protocol'])){
-            $this->_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
+            $this->_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL', FILTER_SANITIZE_STRING);
         }
         
         if(!isset($this->_aConfig['http_host']) || empty($this->_aConfig['http_host'])){
-            $this->_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST');
+            $this->_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
         }
         
         if(!isset($this->_aConfig['protocol']) || empty($this->_aConfig['protocol'])){
-            $sHttps = filter_input(INPUT_SERVER, 'HTTPS');
+            $sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
             if($sHttps != 'off'){
 		        $this->_aConfig['protocol'] = 'https';
 	        }else{
@@ -60,7 +56,7 @@ class Config {
 	public function get(){	
 		$aArgs = func_get_args();
 		
-		$aResult = array();
+		$aResult = null;
 		foreach($aArgs as $sArg){
 			if(empty($aResult)){
 				if(isset($this->_aConfig[$sArg])){

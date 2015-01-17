@@ -7,7 +7,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 	private $sRootPath;
     
     public function setUp(){		
-		$this->sRootPath = (defined('ROOT_PATH') && strlen(ROOT_PATH) > 0) ? ROOT_PATH : realpath('../'.dirname(__FILE__));
+		$this->sRootPath = (defined('ROOT_PATH') && strlen(ROOT_PATH) > 0) ? ROOT_PATH : dirname(__DIR__);
     }
     
     public function tearDown(){
@@ -33,7 +33,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		$this->oCrispus = new Crispus\Crispus($this->sRootPath.'/config/config.json');
 		
 		// Test if config values can be successfully retrieved
-		$sMd = $this->oCrispus->config('crispus', 'content_extension');
+		$sMd = $this->oCrispus->_oConfig->get('crispus', 'content_extension');
 		$this->assertEquals('md', $sMd);
 	}
 	
