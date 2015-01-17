@@ -11,14 +11,12 @@ class IndexController {
 	public $sJs;
 	public $sCss;
 	public $aHeaders = array();
-	private static $oConfig;
 	
 	private $sContent;
 	private $oCrispus;
 
 	public function __construct($oCrispus){	
         $this->oCrispus = $oCrispus;
-		$this->oConfig = $oCrispus->oConfig;
 	}
 	
 	public function processPage($sUrl, $sContent){
@@ -26,7 +24,7 @@ class IndexController {
 		$this->sContent = $this->processMarkdown($sContent);
 		
 		// Add excerpt
-		$iLength = $this->oConfig::get('site','excerpt_length');
+		$iLength = $this->oCrispus->_oConfig->get('site','excerpt_length');
 		$iLength = (!empty($iLength)) ? $iLength : 150;
 		$this->aCustomTwigVars['excerpt'] = $this->excerpt(strip_tags($this->sContent), $iLength);
 		
@@ -59,7 +57,7 @@ class IndexController {
 	    // Remove comments/meta
 	    $sContent = preg_replace('#/\*.+?\*/#s', '', $sContent);
 	    // Base URL
-	    $sContent = str_replace('%base_url%', $this->oConfig::get('root_url'), $sContent);
+	    $sContent = str_replace('%base_url%', $this->oCrispus->_oConfig->get('site', 'base_url'), $sContent);
 	    // Markdown
 	    $sContent = \Michelf\MarkdownExtra::defaultTransform($sContent);
 	    
@@ -92,9 +90,9 @@ class IndexController {
 	}
 	
 	private function setCssJsFromHeaders(){
-	   	$sThemeUrl = $this->oConfig::get('crispus','urls','themes').'/'.$this->oConfig::get('site','theme');    
-	    $sCssUrl = $sThemeUrl.'/'.$this->oConfig::get('site','css_theme_folder').'/';
-	    $sJsUrl = $sThemeUrl.'/'.$this->oConfig::get('site','js_theme_folder').'/';
+	   	$sThemeUrl = $this->oCrispus->_oConfig->getUrl('themes').'/'.$this->oCrispus->_oConfig->get('site','theme');    
+	    $sCssUrl = $sThemeUrl.'/'.$this->oCrispus->_oConfig->get('site','css_theme_folder').'/';
+	    $sJsUrl = $sThemeUrl.'/'.$this->oCrispus->_oConfig->get('site','js_theme_folder').'/';
 	
 	    if(isset($this->aCustomTwigVars['css'])){
 	        $aCss = explode(',', $this->aCustomTwigVars['css']);
@@ -118,7 +116,7 @@ class IndexController {
 	}
 	
 	private function convertHeaderValue($sValue){
-	    $sValue = str_replace('%base_url%', $this->oConfig::get('root_url'), $sValue);
+	    $sValue = str_replace('%base_url%', $this->oCrispus->_oConfig->get('site', 'base_url'), $sValue);
 	
 		if(strtolower($sValue) == "true"){
 			// Boolean true

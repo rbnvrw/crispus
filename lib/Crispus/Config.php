@@ -5,63 +5,66 @@ namespace Crispus;
 
 class Config {
 
-    public static $_instance;
-	private static $_aConfig;
+	private $_aConfig;
 	    
-    public function __construct($sConfigFile = '../../config/config.json'){
+    public function __construct($sConfigFile = 'config.json'){
                
 		if(file_exists($sConfigFile)){
 			$sConfig = file_get_contents($sConfigFile);
 		} else {
-			throw new Exception("Config file doesn't exist: ".$sConfigFile);
+			throw new \Exception("Config file doesn't exist: ".$sConfigFile);
 		}
 		
-		self::$_aConfig = json_decode($json_data, true);
+		$this->_aConfig = json_decode($sConfig, true);
 		
-		self::setup();
+		$this->setup();
         
     }
 	
-	public static function setup() {
+	public function setup() {
 		// Set up parameters
-        if(!isset(self::$_aConfig['crispus']['paths']['root']) || empty(self::$_aConfig['crispus']['paths']['root'])){
-            self::$_aConfig['crispus']['paths']['root'] = realpath(dirname(__FILE__).'/../../');
+        if(!isset($this->_aConfig['crispus']['paths']['root']) || empty($this->_aConfig['crispus']['paths']['root'])){
+            $this->_aConfig['crispus']['paths']['root'] = realpath(dirname(__FILE__).'/../../');
         }
         
-        if(!isset(self::$_aConfig['request_uri']) || empty(self::$_aConfig['request_uri'])){
-            self::$_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI');
+        if(!isset($this->_aConfig['request_uri']) || empty($this->_aConfig['request_uri'])){
+            $this->_aConfig['request_uri'] = filter_input(INPUT_SERVER, 'REQUEST_URI');
         }
         
-        if(!isset(self::$_aConfig['script_path']) || empty(self::$_aConfig['script_path'])){
-            self::$_aConfig['script_path'] = filter_input(INPUT_SERVER, 'PHP_SELF');
+        if(!isset($this->_aConfig['script_path']) || empty($this->_aConfig['script_path'])){
+            $this->_aConfig['script_path'] = filter_input(INPUT_SERVER, 'PHP_SELF');
         }
         
-        if(!isset(self::$_aConfig['server_protocol']) || empty(self::$_aConfig['server_protocol'])){
-            self::$_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
+        if(!isset($this->_aConfig['server_protocol']) || empty($this->_aConfig['server_protocol'])){
+            $this->_aConfig['server_protocol'] = filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
         }
         
-        if(!isset(self::$_aConfig['http_host']) || empty(self::$_aConfig['http_host'])){
-            self::$_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST');
+        if(!isset($this->_aConfig['http_host']) || empty($this->_aConfig['http_host'])){
+            $this->_aConfig['http_host'] = filter_input(INPUT_SERVER, 'HTTP_HOST');
         }
         
-        if(!isset(self::$_aConfig['protocol']) || empty(self::$_aConfig['protocol'])){
+        if(!isset($this->_aConfig['protocol']) || empty($this->_aConfig['protocol'])){
             $sHttps = filter_input(INPUT_SERVER, 'HTTPS');
             if($sHttps != 'off'){
-		        self::$_aConfig['protocol'] = 'https';
+		        $this->_aConfig['protocol'] = 'https';
 	        }else{
-	            self::$_aConfig['protocol'] = 'http';
+	            $this->_aConfig['protocol'] = 'http';
 	        }
         }
+		
+		if(!isset($this->_aConfig['site']['base_url']) || empty($this->_aConfig['site']['base_url'])){
+			$this->_aConfig['site']['base_url'] = '/';
+		}
 	}
 	
-	public static function get(){	
+	public function get(){	
 		$aArgs = func_get_args();
 		
 		$aResult = array();
 		foreach($aArgs as $sArg){
 			if(empty($aResult)){
-				if(isset(self::$_aConfig[$sArg])){
-					$aResult = self::$_aConfig[$sArg];
+				if(isset($this->_aConfig[$sArg])){
+					$aResult = $this->_aConfig[$sArg];
 				}
 			}else{
 				if(isset($aResult[$sArg])){
@@ -72,17 +75,30 @@ class Config {
 		return $aResult;	
 	}
 	
-	public static function getPath($sKey, $sGroup = 'crispus'){
+	public function getPath($sKey, $sGroup = 'crispus'){
 		$sRoot = '';
-		if(isset(self::$_aConfig['crispus']['paths']['root'])){
-			$sRoot = self::$_aConfig['crispus']['paths']['root'];
+		if(isset($this->_aConfig['crispus']['paths']['root'])){
+			$sRoot = $this->_aConfig['crispus']['paths']['root'];
 		}
 	
-		if(isset(self::$_aConfig[$sGroup]['paths'][$sKey])){
-			return $sRoot.self::$_aConfig[$sGroup]['paths'][$sKey];
+		if(isset($this->_aConfig[$sGroup]['paths'][$sKey])){
+			return $sRoot.$this->_aConfig[$sGroup]['paths'][$sKey];
 		}
 		
 		return $sRoot;
+	}
+	
+	public function getUrl($sKey, $sGroup = 'crispus'){
+		$sBaseUrl = '/';
+		if(isset($this->_aConfig['site']['base_url'])){
+			$sBaseUrl = $this->_aConfig['site']['base_url'];
+		}
+	
+		if(isset($this->_aConfig[$sGroup]['paths'][$sKey])){
+			return $sBaseUrl.$this->_aConfig[$sGroup]['paths'][$sKey];
+		}
+		
+		return $sBaseUrl;
 	}
 	
 }
