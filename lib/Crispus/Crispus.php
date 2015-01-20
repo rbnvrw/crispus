@@ -194,31 +194,25 @@ class Crispus {
 	
 	private function getPageForPageArray($sPage, $bRenderContent = false) {
 		$sContentPath = $this->_oConfig->getPath('content');
-		$sContentExt = $this->_oConfig->get('crispus','content_extension');
+		$sContentExt = '.'.$this->_oConfig->get('crispus','content_extension');
 	
 		// Strip directory and extension
-		$sUrl = str_replace(array($sContentPath, 
-									'.'.$sContentExt), '', $sPage);
+		$sUrl = str_replace(array($sContentPath, $sContentExt), '', $sPage);
 		
 		$sContent = $this->getFileContents($sPage);
 		
 		// Get page controller
-		$oPage = $this->getPageController($sUrl);
-		
+		$oPage = $this->getPageController($sUrl);		
 		$aHeaders = $oPage->getHeaders($sUrl, $sContent);
-		
-		$aPage = null;
 		
 		if($bRenderContent){
 			$sPageContent = $oPage->processPage($sUrl, $sContent);
-			$aPage = array('url' => $this->formatUrl($sUrl), 
-									'headers' => $aHeaders,
-									'content' => $sPageContent);
+			return array(  'url' => $this->formatUrl($sUrl), 
+						    'headers' => $aHeaders,
+						    'content' => $sPageContent);
 		}else{
-			$aPage = array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
+			return array('url' => $this->formatUrl($sUrl), 'headers' => $aHeaders);
 		}
-		
-		return $aPage;
 	}
 	
 	private function getFileContents($sPath) {
@@ -258,19 +252,17 @@ class Crispus {
 	protected function getFiles($sDirectory, $sExt = '')
 	{
 	    $aFiles = array();
-	    if($oHandle = opendir($sDirectory)){
-	        while(false !== ($oFile = readdir($oHandle))){
-	            if(preg_match("/^(^\.)/", $oFile) === 0){
-	                if(is_dir($sDirectory. "/" . $oFile)){
-	                    $aFiles = array_merge($aFiles, $this->getFiles($sDirectory. "/" . $oFile, $sExt));
-	                } else {
-	                    $oFile = $sDirectory . "/" . $oFile;
-	                    if(!$sExt || strstr($oFile, $sExt)) $aFiles[] = preg_replace("/\/\//si", "/", $oFile);
-	                }
+	    
+	    foreach(new \DirectoryIterator($sDirectory) as $oFileInfo){
+	        if($oFileInfo->isDir() && !$oFileInfo->isDot()){
+	            $aFiles = array_merge($aFiles, $this->getFiles($oFileInfo->getPathname(), $sExt));  
+	        }elseif($oFileInfo->isFile()){
+	            if(empty($sExt) || $sExt == $oFileInfo->getExtension()){
+	                $aFiles[] = $oFileInfo->getPathname();
 	            }
-	        }
-	        closedir($oHandle);
+	        }	            
 	    }
+	    
 	    return $aFiles;
 	}
 	
