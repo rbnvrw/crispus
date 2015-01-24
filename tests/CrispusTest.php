@@ -21,8 +21,9 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('success', $sContent);
 		
 		// Test Filesystem->getFiles()
-		$aFiles = $oFilesystem->getFiles($this->sRootPath.'/tests/resources/data/test_list_files/', 'txt');		
-		$this->assertEquals(array('one.txt', 'two.txt', 'three.txt'), $aFiles);
+		$sTestPath = $this->sRootPath.'/tests/resources/data/test_list_files/';
+		$aFiles = $oFilesystem->getFiles($sTestPath, 'txt');		
+		$this->assertEquals(array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt'), $aFiles);
 	}
 	
 	public function testSiteConfig(){
