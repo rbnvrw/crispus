@@ -14,7 +14,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
         unset($this->oCrispus);
     }
 	
-	public function fileOpenTest(){
+	public function testOpenFile(){
 		// Test Filesystem->getFileContents
 		
 		$oFilesystem = new Crispus\Filesystem();
