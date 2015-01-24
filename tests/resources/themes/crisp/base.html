@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% if page.description %}
+	    <meta name="description" content="{{ page.description }}"> 
+    {% endif %}
+    {% if page.robots %}
+	    <meta name="robots" content="{{ page.robots }}">
+    {% endif %}
+    {% if page.author %}
+	    <meta name="author" content="{{ page.author }}"> 
+    {% endif %}
+    
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+        
+  </head>
+
+  <body>
+    
+    {% block content %}
+    <div>
+        {{ blocks.content }}
+    </div> <!-- /container -->
+    {% endblock %}
+    
+  </body>
+</html>

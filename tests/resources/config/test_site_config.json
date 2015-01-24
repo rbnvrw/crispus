@@ -10,7 +10,8 @@
 			"sort_order": "asc",
 			"sort_by": "sorting"
 		},
-		"render_content_page_list": false
+		"render_content_page_list": false,
+		"base_url": "http://rubenverweij.nl"
     },
 	"twig": {
 		"cache": false,
