@@ -30,7 +30,8 @@ class Page {
 		$this->_oGlobalConfig = new SiteConfig($sGlobalConfigFile);
 		
 		// Set URL
-		$this->setUrl($sUrl);
+		$this->sUrl = $sUrl;
+		$this->setPath();
 	}
 	
 	public function build()
@@ -65,9 +66,7 @@ class Page {
 		return $this->sTemplate;
 	}
 	
-	private function setUrl($sUrl){
-		$this->sUrl = $sUrl;
-		
+	private function setPath(){		
 		// Get the path to this page's file
 		$sPageDir = $this->_oGlobalConfig->getPath('pages') . '/';
         $this->sPath =  $sPageDir . $this->sUrl;
@@ -80,7 +79,11 @@ class Page {
 	}
 	
 	private function setConfig(){
-		$oPageConfig = new Config($this->sPath.'/'.$sConfigFile);
+		if(empty($this->sPath)){
+			$this->setPath();
+		}
+	
+		$oPageConfig = new Config($this->sPath.'/'.$this->sConfigFile);
 		$this->aConfig = $oPageConfig->getConfig();
 		
 		// Set page template

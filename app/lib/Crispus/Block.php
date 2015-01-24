@@ -29,16 +29,16 @@ class Block {
 			
 			$sFileContents = $oFilesystem->getFileContents($this->sPath);
 			
-			return processMarkdown($sFileContents);
+			return $this->processMarkdown($sFileContents);
 		}
 		
 		return null;
 	}
 	
 	public function getName(){
-		$sBlockExt = $this->_oGlobalConfig->get('crispus', 'block_extension');
+		$sBlockExt = $this->_oConfig->get('crispus', 'block_extension');
 		
-		return basename($this->sPath, $sBlockExt);
+		return basename($this->sPath, '.'.$sBlockExt);
 	}
 	
 	private function processMarkdown($sContent){

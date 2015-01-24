@@ -14,10 +14,13 @@ class CrispusTest extends PHPUnit_Framework_TestCase
         unset($this->oCrispus);
     }
 	
-	public function emptyTest(){
-		// Placeholder test
+	public function fileOpenTest(){
+		// Test Filesystem->getFileContents
 		
-		$this->assertEquals('test', 'test');
+		$oFilesystem = new Crispus\Filesystem();
+		$sContent = $oFilesystem->getFileContents($this->sRootPath.'/tests/resources/data/getFileContentsTest.txt');
+		
+		$this->assertEquals('success', $sContent);
 	}
 	
 }

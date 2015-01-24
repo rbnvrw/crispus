@@ -10,12 +10,10 @@ namespace Crispus;
  * @version 0.1
  */
 class SiteConfig extends Config {
-
-	private $_aConfig;
 	    
     public function __construct($sConfigFile = 'config.json'){
                
-		parent::__construct();
+		parent::__construct($sConfigFile);
 		
 		$this->setup();
         
@@ -24,7 +22,7 @@ class SiteConfig extends Config {
 	private function setup() {
 		// Set up parameters
         	
-		$this->_aConfig['crispus']['paths']['root'] = (isset($this->_aConfig['crispus']['paths']['root'])) ? $this->_aConfig['crispus']['paths']['root'] : realpath(__DIR__.'/../../');
+		$this->_aConfig['crispus']['paths']['root'] = (isset($this->_aConfig['crispus']['paths']['root'])) ? $this->_aConfig['crispus']['paths']['root'] : realpath(__DIR__.'/../../../../../../');
         
         $this->_aConfig['request_uri'] = (isset($this->_aConfig['request_uri'])) ? $this->_aConfig['request_uri'] : filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
                 

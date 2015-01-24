@@ -12,18 +12,18 @@ namespace Crispus;
 
 class Config {
 
-	private $_aConfig;
+	protected $_aConfig;
 	    
     public function __construct($sConfigFile = 'config.json'){
                
-		if(file_exists($sConfigFile)){
-			$sConfig = file_get_contents($sConfigFile);
-		} else {
-			throw new \Exception("Config file doesn't exist: ".$sConfigFile);
-		}
+		$oFilesystem = new Filesystem();		
+		$sContents = $oFilesystem->getFileContents($sConfigFile);
 		
-		$this->_aConfig = json_decode($sConfig, true);
-        
+		if(!empty($sContents)){
+			$this->_aConfig = json_decode($sContents, true);
+		}else{
+			$this->_aConfig = array();
+		}        
     }
 	
 	public function get(){	

@@ -21,7 +21,10 @@ class Crispus {
 		$this->_oConfig = new SiteConfig($this->sConfigFile);
 	
 		// Set up router
-        $this->determineUrl();   		
+        $sUrl = $this->determineUrl();  
+
+		// Now that we now the relative URL, serve the page
+		echo $this->renderPage($sUrl); 		
     }
 	    
     /**
@@ -37,8 +40,11 @@ class Crispus {
 		$sUrl = preg_replace('/\?.*/', '', $sUrl); // Strip query string
 		$sUrl = preg_replace('#index$#i', '', $sUrl); // Strip 'index' off end
 		
-		// Now that we now the relative URL, serve the page
-		echo $this->renderPage($sUrl);
+		if(empty($sUrl)){
+			return 'index';
+		}
+		
+		return $sUrl;
     }
     	
 	private function renderPage($sUrl){

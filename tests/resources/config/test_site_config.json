@@ -1,0 +1,29 @@
+{
+    "site": {
+		"title": "Crispus CMS",
+		"theme": "crisp",
+		"not_found_page": "404",
+		"css_theme_folder": "css",
+		"js_theme_folder": "js",
+		"excerpt_length": 150,
+		"menu": {
+			"sort_order": "asc",
+			"sort_by": "sorting"
+		},
+		"render_content_page_list": false
+    },
+	"twig": {
+		"cache": false,
+        "autoescape": false
+	},
+	"crispus": {
+		"block_extension": "md",
+		"paths": {
+			"cache": "/test/resources/data/cache",
+			"pages": "/test/resources/pages",
+			"data": "/test/resources/data",
+			"themes": "/test/resources/themes",
+			"vendor": "/vendor"
+		}
+	}
+}

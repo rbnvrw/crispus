@@ -39,11 +39,11 @@ class Theme {
 		$this->renderAssets();
 	
 		// Render page using Twig
-		return runTwig(array(), $this->aPageConfig);
+		return $this->runTwig();
 	}
 	
 	public function setPageConfig($aConfig) {
-		$this->aPageConfig = $aConfig;
+		$this->aPageConfig = array_change_key_case($aConfig, CASE_LOWER);
 	}
 	
 	public function setTemplate($sTemplate) {
@@ -74,7 +74,7 @@ class Theme {
 		$this->aRenderedAssets = $oAssetManager->render();
 	}
 
-	private function runTwig($aTwigConfig, $aVars){
+	private function runTwig(){
 		// Pass it through Twig (load the theme)
 		\Twig_Autoloader::register();
 		
@@ -90,11 +90,17 @@ class Theme {
 		}
 		$aVars['assets'] = $this->aRenderedAssets;
 		
+		// Page config
+		$aVars['page'] = $this->aPageConfig;
+		
+		// Global site config
+		$aVars['site'] = $this->_oConfig->get('site');
+		
 		$sThemePath = $this->_oConfig->getPath('themes').'/' . $this->sTheme . '/';
 		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
-		$oTwig = new \Twig_Environment($oLoader, $aConfig);
+		$oTwig = new \Twig_Environment($oLoader, $this->_oConfig->get('twig'));
 		
 		return $oTwig->render($this->sTemplate.'.html', $aVars);
 	}

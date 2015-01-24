@@ -22,7 +22,11 @@ class AssetManager {
 		$this->aAssets = array();
 	}
 	
-	public function addAssets($aAssets){		
+	public function addAssets($aAssets){	
+		if(!is_array($aAssets)){
+			return;
+		}
+	
 		foreach($aAssets as $sAsset){
 			$sExt = pathinfo($sAsset, PATHINFO_EXTENSION);
 			
