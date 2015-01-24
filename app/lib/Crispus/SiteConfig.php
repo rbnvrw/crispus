@@ -1,21 +1,21 @@
 <?php
 namespace Crispus;
 
-// Class to hold all configuration
-
-class Config {
+/**
+ * Crispus CMS
+ *
+ * @author Ruben Verweij
+ * @link http://rubenverweij.nl
+ * @license http://opensource.org/licenses/MIT
+ * @version 0.1
+ */
+class SiteConfig extends Config {
 
 	private $_aConfig;
 	    
     public function __construct($sConfigFile = 'config.json'){
                
-		if(file_exists($sConfigFile)){
-			$sConfig = file_get_contents($sConfigFile);
-		} else {
-			throw new \Exception("Config file doesn't exist: ".$sConfigFile);
-		}
-		
-		$this->_aConfig = json_decode($sConfig, true);
+		parent::__construct();
 		
 		$this->setup();
         
@@ -49,24 +49,6 @@ class Config {
 		return $this->_aConfig['protocol'];
 	}
 	
-	public function get(){	
-		$aArgs = func_get_args();
-		
-		$aResult = null;
-		foreach($aArgs as $sArg){
-			if(empty($aResult)){
-				if(isset($this->_aConfig[$sArg])){
-					$aResult = $this->_aConfig[$sArg];
-				}
-			}else{
-				if(isset($aResult[$sArg])){
-					$aResult = $aResult[$sArg];
-				}
-			}
-		}
-		return $aResult;	
-	}
-	
 	public function getPath($sKey, $sGroup = 'crispus'){
 		$sRoot = '';
 		if(isset($this->_aConfig['crispus']['paths']['root'])){
@@ -80,11 +62,16 @@ class Config {
 		return $sRoot;
 	}
 	
-	public function getUrl($sKey, $sGroup = 'crispus'){
+	public function getBaseUrl(){
 		$sBaseUrl = '/';
 		if(isset($this->_aConfig['site']['base_url'])){
 			$sBaseUrl = $this->_aConfig['site']['base_url'];
 		}
+		return $sBaseUrl;
+	}
+	
+	public function getUrl($sKey, $sGroup = 'crispus'){
+		$sBaseUrl = $this->getBaseUrl();
 	
 		if(isset($this->_aConfig[$sGroup]['paths'][$sKey])){
 			return $sBaseUrl.$this->_aConfig[$sGroup]['paths'][$sKey];
