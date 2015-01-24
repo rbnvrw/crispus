@@ -20,9 +20,7 @@ class SiteConfig extends Config {
     }
 	
 	private function setup() {
-		// Set up parameters
-        	
-		$this->_aConfig['crispus']['paths']['root'] = (isset($this->_aConfig['crispus']['paths']['root'])) ? $this->_aConfig['crispus']['paths']['root'] : realpath(__DIR__.'/../../../../../../');
+		$this->setRootPath();
         
         $this->_aConfig['request_uri'] = (isset($this->_aConfig['request_uri'])) ? $this->_aConfig['request_uri'] : filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
                 
@@ -78,4 +76,28 @@ class SiteConfig extends Config {
 		return $sBaseUrl;
 	}
 	
+	private function setRootPath(){		
+		if(!isset($this->_aConfig['crispus']['paths']['root'])){
+			/* Vendor directory is in the root, step up until we find vendor
+			 * Limit to 10 levels. */
+			$sCurDir = __DIR__;
+			$sRelativePath = '';
+			$oFilesystem = new Filesystem();
+			
+			for($iI = 0; $iI < 10; $iI++){
+				$aDirs = $oFilesystem->getDirectories($sCurDir, false);
+				
+				if(!in_array('vendor', $aDirs)){
+					$sCurDir = dirname($sCurDir);
+					$sRelativePath .= '/..';
+				}else{
+					break;
+				}
+			}
+			
+			$sRelativePath .= '/';
+		
+			$this->_aConfig['crispus']['paths']['root'] = realpath(__DIR__.$sRelativePath);
+		}		
+	}
 }

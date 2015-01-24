@@ -12,7 +12,7 @@ namespace Crispus;
 class Filesystem {
 
 	/**
-	 * Helper function to recursively get all files in a directory
+	 * Helper function to get all files in a directory
 	 *
 	 * @param string $sDirectory start directory
 	 * @param string $sExt optional limit to file extensions
@@ -23,9 +23,7 @@ class Filesystem {
 	    $aFiles = array();
 	    
 	    foreach(new \DirectoryIterator($sDirectory) as $oFileInfo){
-	        if($oFileInfo->isDir() && !$oFileInfo->isDot()){
-	            $aFiles = array_merge($aFiles, $this->getFiles($oFileInfo->getPathname(), $sExt));  
-	        }elseif($oFileInfo->isFile()){
+	        if($oFileInfo->isFile()){
 	            if(empty($sExt) || $sExt == $oFileInfo->getExtension()){
 	                $aFiles[] = $oFileInfo->getPathname();
 	            }
@@ -33,6 +31,22 @@ class Filesystem {
 	    }
 	    
 	    return $aFiles;
+	}
+	
+	public function getDirectories($sDirectory, $bWithPath = true){
+		$aDirs = array();
+	    
+	    foreach(new \DirectoryIterator($sDirectory) as $oFileInfo){
+	        if($oFileInfo->isDir()){
+				if($bWithPath){
+					$aDirs[] = $oFileInfo->getPathname();
+				}else{
+					$aDirs[] = $oFileInfo->getFilename();
+				}
+	        }	            
+	    }
+	    
+	    return $aDirs;
 	}
 	
 	public function getFileContents($sPath) {

@@ -22,7 +22,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		
 		// Test Filesystem->getFiles()
 		$aFiles = $oFilesystem->getFiles($this->sRootPath.'/tests/resources/data/test_list_files/', 'txt');		
-		$this->assertEquals(array('one.txt', 'two.txt', 'three.txt'), $sContent);
+		$this->assertEquals(array('one.txt', 'two.txt', 'three.txt'), $aFiles);
 	}
 	
 	public function testSiteConfig(){
