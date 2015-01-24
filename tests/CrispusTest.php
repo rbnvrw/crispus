@@ -23,7 +23,14 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test Filesystem->getFiles()
 		$sTestPath = $this->sRootPath.'/tests/resources/data/test_list_files/';
 		$aFiles = $oFilesystem->getFiles($sTestPath, 'txt');		
-		$this->assertEquals(array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt'), $aFiles);
+		$bSuccess = false;
+		$aExpected = array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt');
+		
+		$bSuccess = false;
+		if(count(array_diff($aExpected, $aFiles)) == 0 && count(array_diff($aFiles, $aExpected)) == 0){
+			$bSuccess = true;
+		}
+		$this->assertTrue($bSuccess);
 	}
 	
 	public function testSiteConfig(){
