@@ -14,15 +14,16 @@
         "php": "*",
         "twig/twig": "*",
         "michelf/php-markdown": "*",
-		"kriswallsmith/assetic": "*"
+		"kriswallsmith/assetic": "*",
+		"packagist/yuicompressor-bin": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.4.*",
+        "phpunit/phpunit": "*",
 		"codeclimate/php-test-reporter": "dev-master"
     },
     "autoload": {
         "psr-0" : {
-            "Crispus" : "app/lib/"
+            "Crispus" : "app/"
         }
     }
 }

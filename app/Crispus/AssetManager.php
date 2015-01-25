@@ -15,11 +15,14 @@ class AssetManager {
 	
 	private $aAssets;
 	private $aFilters;
+	
+	private $sThemePath;
 
 	public function __construct($sConfigFile = 'config.json')
     {
 		$this->_oConfig = new SiteConfig($sConfigFile);		
 		$this->aAssets = array();
+		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
 	}
 	
 	public function addAssets($aAssets){	
@@ -48,7 +51,7 @@ class AssetManager {
 		}
 		
 		// Create the asset factory
-		$oFactory = new \Assetic\Factory\AssetFactory();
+		$oFactory = new \Assetic\Factory\AssetFactory($this->sThemePath);
 		$oFactory->setAssetManager($oManager);
 		$oFactory->addWorker(new \Assetic\Factory\Worker\CacheBustingWorker());
 		
@@ -61,15 +64,17 @@ class AssetManager {
 	}
 	
 	private function addAsset($sPath, $sExt){
-		if(!is_array($this->aAssets[$sExt])){
+		if(!isset($this->aAssets[$sExt]) || !is_array($this->aAssets[$sExt])){
 			$this->aAssets[$sExt] = array();
 		}
+		
+		$sPath = $this->sThemePath . '/' . $sPath;
 		
 		$this->aAssets[$sExt][] = new \Assetic\Asset\FileAsset($sPath, $this->getFilters($sExt));
 	}
 	
 	private function initFilters() {
-		$this->aFilters['css'] = array('CssMinFilter', 'CssRewriteFilter');
+		$this->aFilters['css'] = array('Yui\\CssCompressorFilter');
 
 		$this->aFilters['js'] = array('Yui\\JsCompressorFilter');
 	}
