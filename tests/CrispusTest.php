@@ -26,11 +26,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		$bSuccess = false;
 		$aExpected = array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt');
 		
-		$bSuccess = false;
-		if(count(array_diff($aExpected, $aFiles)) == 0 && count(array_diff($aFiles, $aExpected)) == 0){
-			$bSuccess = true;
-		}
-		$this->assertTrue($bSuccess);
+		$this->assertEquals(sort($aExpected), sort($aFiles));
 	}
 	
 	public function testSiteConfig(){
@@ -40,7 +36,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('crisp', $oConfig->get('site', 'theme'));
 		
 		// Test SiteConfig->getBaseUrl()
-		$this->assertEquals('http://rubenverweij.nl', $oConfig->getBaseUrl());
+		$this->assertEquals('http://rubenverweij.nl/', $oConfig->getBaseUrl());
 		
 		// Test SiteConfig->getUrl()
 		$this->assertEquals('http://rubenverweij.nl/vendor', $oConfig->getUrl('vendor'));
@@ -48,4 +44,5 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test SiteConfig->getPath()
 		$this->assertEquals($this->sRootPath.'/vendor', $oConfig->getPath('vendor'));		
 	}
+	
 }

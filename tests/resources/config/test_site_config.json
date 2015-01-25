@@ -26,5 +26,6 @@
 			"themes": "/test/resources/themes",
 			"vendor": "/vendor"
 		}
-	}
+	},
+	"request_uri": "/index"
 }
