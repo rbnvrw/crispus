@@ -67,6 +67,11 @@ class SiteConfig extends Config {
 		if(isset($this->_aConfig['site']['base_url'])){
 			$sBaseUrl = $this->_aConfig['site']['base_url'];
 		}
+		
+		if(substr($sBaseUrl, -1) !== '/'){
+			$sBaseUrl .= '/';
+		}
+		
 		return $sBaseUrl;
 	}
 	

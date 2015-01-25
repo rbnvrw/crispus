@@ -35,9 +35,13 @@ class Filesystem {
 	
 	public function getDirectories($sDirectory, $bWithPath = true){
 		$aDirs = array();
+		
+		if(!is_dir($sDirectory)){
+			return $aDirs;
+		}
 	    
 	    foreach(new \DirectoryIterator($sDirectory) as $oFileInfo){
-	        if($oFileInfo->isDir()){
+	        if($oFileInfo->isDir() && !$oFileInfo->isDot()){
 				if($bWithPath){
 					$aDirs[] = $oFileInfo->getPathname();
 				}else{

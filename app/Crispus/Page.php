@@ -47,6 +47,10 @@ class Page {
 	}
 	
 	public function getConfig(){
+		if(empty($this->aConfig)){
+			$this->setConfig();
+		}
+	
 		return $this->aConfig;
 	}
 	

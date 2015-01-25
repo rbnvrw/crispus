@@ -55,13 +55,37 @@ class Crispus {
 		// Get the theme
 		$sTheme = $this->_oConfig->get('site', 'theme');
 		$oTheme = new Theme($sTheme, $this->sConfigFile);
+		
 		// Add assets, blocks and config
 		$oTheme->setPageConfig($oPage->getConfig());
 		$oTheme->setTemplate($oPage->getTemplate());
 		$oTheme->addBlocks($oPage->getBlocks());
-		$oTheme->addAssets($oPage->getAssets());	
+		$oTheme->addAssets($oPage->getAssets());
+
+		// Add page list for menus
+		$oTheme->setPageList($this->getAllPages());
 		
 		return $oTheme->renderPage();		
+	}
+	
+	private function getAllPages(){
+		return $this->getAllPagesInDir('/');
+	}
+	
+	private function getAllPagesInDir($sUrl){
+		$oFilesystem = new Filesystem();
+		$aPages = array();
+		
+		$aDirs = $oFilesystem->getDirectories($this->_oConfig->getPath('pages').$sUrl, false);
+		
+		foreach($aDirs as $sDir){
+			$oPage = new Page($sUrl.$sDir, $this->sConfigFile);
+			$aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
+			
+			$aPages[] = array('url' => $sUrl.$sDir, 'config' => $aConfig, 'children' => $this->getAllPagesInDir($sUrl.$sDir));
+		}
+		
+		return $aPages;
 	}
 
 }

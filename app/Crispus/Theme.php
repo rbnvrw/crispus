@@ -19,6 +19,7 @@ class Theme {
 	private $sTemplate;
 	private $aBlocks;
 	private $aAssets;
+	private $aPageList;
 	
 	private $aRenderedBlocks;
 	private $aRenderedAssets;
@@ -60,6 +61,10 @@ class Theme {
 		$this->aAssets = $aAssets;
 	}
 	
+	public function setPageList($aPageList) {
+		$this->aPageList = $aPageList;
+	}
+	
 	private function renderBlocks(){
 		$this->aRenderedBlocks = array();
 		
@@ -97,6 +102,9 @@ class Theme {
 		
 		// Global site config
 		$aVars['site'] = $this->_oConfig->get('site');
+		
+		// Page list
+		$aVars['pages'] = $this->aPageList;
 		
 		$sThemePath = $this->_oConfig->getPath('themes').'/' . $this->sTheme . '/';
 		
