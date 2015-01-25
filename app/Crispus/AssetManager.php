@@ -74,9 +74,7 @@ class AssetManager {
 	}
 	
 	private function initFilters() {
-		$this->aFilters['css'] = array('Yui\\CssCompressorFilter');
-
-		$this->aFilters['js'] = array('Yui\\JsCompressorFilter');
+		$this->aFilters = array();
 	}
 	
 	private function getFilters($sExt){

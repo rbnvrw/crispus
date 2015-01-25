@@ -14,8 +14,7 @@
         "php": "*",
         "twig/twig": "*",
         "michelf/php-markdown": "*",
-		"kriswallsmith/assetic": "*",
-		"packagist/yuicompressor-bin": "*"
+		"kriswallsmith/assetic": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
