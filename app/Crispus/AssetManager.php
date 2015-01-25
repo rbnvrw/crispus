@@ -23,9 +23,11 @@ class AssetManager {
 		$this->_oConfig = new SiteConfig($sConfigFile);		
 		$this->aAssets = array();
 		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
+		
+		$this->addAssets($this->_oConfig->get('site', 'assets'), 'global');
 	}
 	
-	public function addAssets($aAssets){	
+	public function addAssets($aAssets, $sType = 'file'){	
 		if(!is_array($aAssets)){
 			return;
 		}
@@ -33,7 +35,7 @@ class AssetManager {
 		foreach($aAssets as $sAsset){
 			$sExt = pathinfo($sAsset, PATHINFO_EXTENSION);
 			
-			$this->addAsset($sAsset, $sExt);
+			$this->addAsset($sAsset, $sExt, $sType);
 		}
 	}
 	
@@ -47,7 +49,9 @@ class AssetManager {
 		
 		// Add all the assets
 		foreach($this->aAssets as $sType => $aAssets){
-			$oManager->set($sType, new \Assetic\Asset\AssetCollection($aAssets));
+			$oCollection = new \Assetic\Asset\AssetCollection($aAssets);
+			$oCollection->setTargetPath('assets.'.$sType);
+			$oManager->set($sType, $oCollection);
 		}
 		
 		// Create the asset factory
@@ -60,17 +64,53 @@ class AssetManager {
 		$oWriter = new \Assetic\AssetWriter($sCachePath);
 		$oWriter->writeManagerAssets($oManager);
 
-		return true;		
+		return $this->getAssets();		
 	}
 	
-	private function addAsset($sPath, $sExt){
+	private function getAssets(){
+		$aAssets = array();
+		
+		foreach($this->aAssets as $sType => $aAssetObjects){
+			$sUrl = $this->getAssetUrl($sType);
+			
+			if(!empty($sUrl)){
+				$aAssets[$sType] = $sUrl;
+			}
+		}
+		
+		return $aAssets;		
+	}
+	
+	private function getAssetUrl($sType){
+		if(empty($sType)){
+			return null;
+		}
+		
+		$sPath = $this->_oConfig->getPath('cache') . '/' . 'assets.' . $sType;
+		
+		if(file_exists($sPath)){
+			return $this->_oConfig->getUrl('cache') . '/' . 'assets.' . $sType;
+		}
+		
+		return null;
+	}
+	
+	private function addAsset($sPath, $sExt, $sType = 'file'){
 		if(!isset($this->aAssets[$sExt]) || !is_array($this->aAssets[$sExt])){
 			$this->aAssets[$sExt] = array();
 		}
 		
-		$sPath = $this->sThemePath . '/' . $sPath;
+		if(substr($sPath, 0, 1) == '/'){		
+			$sPath = $this->_oConfig->getPath('root') . $sPath;		
+		}else{
+			$sPath = $this->sThemePath . '/' . $sPath;
+		}
 		
-		$this->aAssets[$sExt][] = new \Assetic\Asset\FileAsset($sPath, $this->getFilters($sExt));
+		if($sType == 'global'){
+			$this->aAssets[$sExt][] = new \Assetic\Asset\GlobAsset($sPath, $this->getFilters($sExt));
+		}else{
+			$this->aAssets[$sExt][] = new \Assetic\Asset\FileAsset($sPath, $this->getFilters($sExt));
+		}
 	}
 	
 	private function initFilters() {

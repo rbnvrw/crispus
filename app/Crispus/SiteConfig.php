@@ -50,6 +50,10 @@ class SiteConfig extends Config {
 		if(isset($this->_aConfig['crispus']['paths']['root'])){
 			$sRoot = $this->_aConfig['crispus']['paths']['root'];
 		}
+		
+		if($sKey == 'root' && $sGroup == 'crispus'){
+			return $sRoot;
+		}
 	
 		if(isset($this->_aConfig[$sGroup]['paths'][$sKey])){
 			return $sRoot.$this->_aConfig[$sGroup]['paths'][$sKey];
@@ -70,7 +74,7 @@ class SiteConfig extends Config {
 		$sBaseUrl = $this->getBaseUrl();
 	
 		if(isset($this->_aConfig[$sGroup]['paths'][$sKey])){
-			return $sBaseUrl.$this->_aConfig[$sGroup]['paths'][$sKey];
+			return $sBaseUrl . ltrim($this->_aConfig[$sGroup]['paths'][$sKey], '/');
 		}
 		
 		return $sBaseUrl;
