@@ -14,11 +14,6 @@ class CrispusTest extends PHPUnit_Framework_TestCase
         unset($this->oCrispus);
     }
 	
-	/**
-     * @covers Crispus\Filesystem::getFileContents
-     * @covers Crispus\Filesystem::getFiles
-     * @covers Crispus\Filesystem::getAllPagesInDir
-     */
 	public function testFilesystem(){
 		// Test Filesystem->getFileContents()		
 		$oFilesystem = new Crispus\Filesystem();
@@ -46,12 +41,6 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($aExpected, $aNames);		
 	}
 	
-	/**
-     * @covers Crispus\Config::get
-     * @covers Crispus\SiteConfig::getBaseUrl
-     * @covers Crispus\SiteConfig::getUrl
-     * @covers Crispus\SiteConfig::getPath
-     */
 	public function testSiteConfig(){
 		$oConfig = new Crispus\SiteConfig($this->sRootPath.'/tests/resources/config/test_site_config.json');
 		
@@ -67,10 +56,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test SiteConfig->getPath()
 		$this->assertEquals($this->sRootPath.'/vendor', $oConfig->getPath('vendor'));		
 	}
-	
-	/**
-     * @covers Crispus\Page::getConfig
-     */
+
 	public function testPage(){
 	    $oPage = new Crispus\Page('/about', $this->sRootPath.'/tests/resources/config/test_site_config.json');
 	    $oPage->build();
@@ -83,9 +69,6 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 	    $this->assertEquals($aExpected, $aConfig);
 	}
 	
-	/**
-     * @covers Crispus\Crispus::render
-     */
 	public function testCrispus(){
 	    $oCrispus = new Crispus\Crispus($this->sRootPath.'/tests/resources/config/test_site_config.json');
 	    $sOutput = $oCrispus->render();
