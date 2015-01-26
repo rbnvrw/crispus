@@ -64,7 +64,7 @@ class Filesystem {
 		    $aPage = $this->getPageFromDir($sDir, $sUrl, $sGlobalConfigFile);
 		    
 		    if(isset($aPage['config'][$sSortKey]) && !empty($aPage['config'][$sSortKey])){
-		        $aPages[(string)$aPage['config'][$sSortKey]] = $aPage;
+		        $aPages[$aPage['config'][$sSortKey]] = $aPage;
 		    }else{
 		        $aPages[] = $aPage;
 		    }  
