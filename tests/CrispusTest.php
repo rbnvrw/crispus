@@ -23,10 +23,60 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test Filesystem->getFiles()
 		$sTestPath = $this->sRootPath.'/tests/resources/data/test_list_files/';
 		$aFiles = $oFilesystem->getFiles($sTestPath, 'txt');		
-		$bSuccess = false;
 		$aExpected = array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt');
+		sort($aExpected);
+		sort($aFiles);
+		$this->assertEquals($aExpected, $aFiles);
 		
-		$this->assertEquals(sort($aExpected), sort($aFiles));
+		// Test Filesystem->getAllPagesInDir($sPath, $sUrl, $sGlobalConfigFile, $sSortKey = 'sorting', $bAsc = true)
+		$sTestPath = $this->sRootPath.'/tests/resources/pages/';
+		$aPages = $oFilesystem->getAllPagesInDir($sTestPath, '', $this->sRootPath.'/tests/resources/config/test_site_config.json');
+		$aExpected = 
+		    array (
+                  0 => 
+                  array (
+                    'name' => 'index',
+                    'url' => '/index',
+                    'config' => 
+                    array (
+                      'title' => 'Welcome to Crispus CMS!',
+                      'menu' => 'true',
+                      'sorting' => '0',
+                    ),
+                    'children' => 
+                    array (
+                    ),
+                  ),
+                  2 => 
+                  array (
+                    'name' => 'about',
+                    'url' => '/about',
+                    'config' => 
+                    array (
+                      'title' => 'About Crispus CMS',
+                      'menu' => 'true',
+                      'sorting' => '2',
+                    ),
+                    'children' => 
+                    array (
+                    ),
+                  ),
+                  3 => 
+                  array (
+                    'name' => '404',
+                    'url' => '/404',
+                    'config' => 
+                    array (
+                      'title' => 'Page not found',
+                      'menu' => 'false',
+                    ),
+                    'children' => 
+                    array (
+                    ),
+                  ),
+                );
+		
+		$this->assertEquals($aExpected, $aPages);		
 	}
 	
 	public function testSiteConfig(){
@@ -43,6 +93,25 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		
 		// Test SiteConfig->getPath()
 		$this->assertEquals($this->sRootPath.'/vendor', $oConfig->getPath('vendor'));		
+	}
+	
+	public function testPage(){
+	    $oPage = new Crispus\Page('/about', $this->sRootPath.'/tests/resources/config/test_site_config.json');
+	    $oPage->build();
+	    
+	    // Test Page->getConfig()
+	    $aConfig = $oPage->getConfig();
+	    $aExpected = array('title' => "About Crispus CMS", 'menu' => "true", 'sorting' => "2");
+	    sort($aConfig);
+	    sort($aExpected);
+	    $this->assertEquals($aExpected, $aConfig);
+	}
+	
+	public function testCrispus(){
+	    $oCrispus = new Crispus\Crispus($this->sRootPath.'/tests/resources/config/test_site_config.json');
+	    $sOutput = $oCrispus->render();
+	    
+	    $this->assertContains('This is Crispus CMS.', $sOutput);
 	}
 	
 }

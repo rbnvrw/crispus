@@ -20,10 +20,10 @@
 	"crispus": {
 		"block_extension": "md",
 		"paths": {
-			"cache": "/test/resources/data/cache",
-			"pages": "/test/resources/pages",
-			"data": "/test/resources/data",
-			"themes": "/test/resources/themes",
+			"cache": "/tests/resources/data/cache",
+			"pages": "/tests/resources/pages",
+			"data": "/tests/resources/data",
+			"themes": "/tests/resources/themes",
 			"vendor": "/vendor"
 		}
 	},

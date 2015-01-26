@@ -122,6 +122,8 @@ class Page {
 		
 		if(isset($this->aConfig['assets']) && !empty($this->aConfig['assets'])){
 			$this->aAssets = $this->aConfig['assets'];
+		}else{
+		    $this->aAssets = array();
 		}
 	}
 	

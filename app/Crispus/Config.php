@@ -34,10 +34,16 @@ class Config {
 			if(empty($aResult)){
 				if(isset($this->_aConfig[$sArg])){
 					$aResult = $this->_aConfig[$sArg];
+				}else{
+				    $aResult = null;
+				    break;
 				}
 			}else{
 				if(isset($aResult[$sArg])){
 					$aResult = $aResult[$sArg];
+				}else{
+				    $aResult = null;
+				    break;
 				}
 			}
 		}

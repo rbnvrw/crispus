@@ -18,13 +18,15 @@ class Crispus {
     public function __construct($sConfigFile = 'config.json')
     {                   
 		$this->sConfigFile = $sConfigFile;
-		$this->_oConfig = new SiteConfig($this->sConfigFile);
-	
-		// Set up router
+		$this->_oConfig = new SiteConfig($this->sConfigFile); 		
+    }
+    
+    public function render(){
+        // Set up router
         $sUrl = $this->determineUrl();  
 
 		// Now that we now the relative URL, serve the page
-		echo $this->renderPage($sUrl); 		
+		return $this->renderPage($sUrl);
     }
 	    
     /**
