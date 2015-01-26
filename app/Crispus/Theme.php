@@ -116,7 +116,7 @@ class Theme {
 		
 		$oTwig = new \Twig_Environment($oLoader, $this->_oConfig->get('twig'));
 		
-		if($this->_oConfig->get('twig', 'debug') == true){
+		if($this->_oConfig->get('twig', 'debug') === true){
 		    $oTwig->addExtension(new \Twig_Extension_Debug());
 		}
 		

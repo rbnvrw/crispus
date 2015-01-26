@@ -66,13 +66,10 @@ class Crispus {
 		$oTheme->setChildren($oPage->getChildren());
 
 		// Add page list for menus
-		// Sort dirs based on config
-		$sSortKey = $this->_oConfig->get('site', 'menu', 'sort_by');
-		$bAsc = $this->_oConfig->get('site', 'menu', 'sort_asc');
 		$sPath = $this->_oConfig->getPath('pages');
 		
 		$oFilesystem = new Filesystem();
-		$oTheme->setPageList($oFilesystem->getAllPagesInDir($sPath, '', $this->sConfigFile, $sSortKey, $bAsc));
+		$oTheme->setPageList($oFilesystem->getAllPagesInDir($sPath, '', $this->sConfigFile));
 		
 		return $oTheme->renderPage();		
 	}

@@ -73,12 +73,8 @@ class Page {
 	}
 	
 	public function getChildren(){
-	    $oFilesystem = new Filesystem();	
-	    
-	    $sSortKey = $this->_oGlobalConfig->get('site', 'menu', 'sort_by');
-		$bAsc = $this->_oGlobalConfig->get('site', 'menu', 'sort_asc');
-	    			
-		return $oFilesystem->getAllPagesInDir($this->sPath, $this->sUrl, $this->sGlobalConfigFile, $sSortKey, $bAsc);
+	    $oFilesystem = new Filesystem();		    			
+		return $oFilesystem->getAllPagesInDir($this->sPath, $this->sUrl, $this->sGlobalConfigFile);
 	}
 	
 	private function setPath(){		

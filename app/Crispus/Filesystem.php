@@ -53,31 +53,21 @@ class Filesystem {
 	    return $aDirs;
 	}
 	
-	public function getAllPagesInDir($sPath, $sUrl, $sGlobalConfigFile, $sSortKey = 'sorting', $bAsc = true){				
-		$aDirs = $this->getDirectories($sPath, false);
-		
-		if(empty($sSortKey)){
-		    $sSortKey = 'sorting';
-		}
-		
-		if($bAsc !== false){
-		    $bAsc = true;
-		}
-		
+	public function getAllPagesInDir($sPath, $sUrl, $sGlobalConfigFile){		
+		$oConfig = new SiteConfig($sGlobalConfigFile);
+		$sSortKey = $oConfig->get('site', 'menu', 'sort_by');
+		$bAsc = (bool)$oConfig->get('site', 'menu', 'sort_asc');
+				
 		$aPages = array();
-	    
-	    foreach($aDirs as $sDir){
-	    
-			$sNewUrl = $sUrl.'/'.$sDir;
-			
-			$oPage = new Page($sNewUrl, $sGlobalConfigFile);
-			$aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
-			
-			if(isset($aConfig[$sSortKey]) && !empty($aConfig[$sSortKey])){
-			    $aPages[(string)$aConfig[$sSortKey]] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
-			}else{
-			    $aPages[] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
-			}		
+		$aDirs = $this->getDirectories($sPath, false);
+		foreach($aDirs as $sDir){
+		    $aPage = $this->getPageFromDir($sDir, $sUrl, $sGlobalConfigFile);
+		    
+		    if(isset($aPage['config'][$sSortKey]) && !empty($aPage['config'][$sSortKey])){
+		        $aPages[(string)$aPage['config'][$sSortKey]] = $aPage;
+		    }else{
+		        $aPages[] = $aPage;
+		    }  
 		}
 		
 		if($bAsc === false){
@@ -96,6 +86,15 @@ class Filesystem {
 		} 
 		
 		return null;		
+	}
+	
+	private function getPageFromDir($sDir, $sUrl, $sGlobalConfigFile){
+	    $sNewUrl = $sUrl.'/'.$sDir;
+		    
+	    $oPage = new Page($sNewUrl, $sGlobalConfigFile);
+	    $aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
+	
+	    return array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
 	}
 
 }

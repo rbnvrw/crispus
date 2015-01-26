@@ -14,23 +14,17 @@ class CrispusTest extends PHPUnit_Framework_TestCase
         unset($this->oCrispus);
     }
 	
-	public function testFilesystem(){
-		// Test Filesystem->getFileContents()		
+	public function testFilesystemGetFileContents(){
 		$oFilesystem = new Crispus\Filesystem();
 		$sContent = $oFilesystem->getFileContents($this->sRootPath.'/tests/resources/data/getFileContentsTest.txt');		
 		$this->assertEquals('success', $sContent);
-		
-		// Test Filesystem->getFiles()
-		$sTestPath = $this->sRootPath.'/tests/resources/data/test_list_files/';
-		$aFiles = $oFilesystem->getFiles($sTestPath, 'txt');		
-		$aExpected = array($sTestPath.'one.txt', $sTestPath.'two.txt', $sTestPath.'three.txt');
-		sort($aExpected);
-		sort($aFiles);
-		$this->assertEquals($aExpected, $aFiles);
-		
-		// Test Filesystem->getAllPagesInDir($sPath, $sUrl, $sGlobalConfigFile, $sSortKey = 'sorting', $bAsc = true)
+    }
+    
+    public function testFilesystemGetAllPagesInDir(){		
+        $oFilesystem = new Crispus\Filesystem();
 		$sTestPath = $this->sRootPath.'/tests/resources/pages/';
 		$aPages = $oFilesystem->getAllPagesInDir($sTestPath, '', $this->sRootPath.'/tests/resources/config/test_site_config.json');
+
 		$aNames = array();
 		foreach($aPages as $aPage){
 		    $aNames[] = $aPage['name'];
