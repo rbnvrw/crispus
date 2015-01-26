@@ -47,7 +47,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
                     array (
                     ),
                   ),
-                  2 => 
+                  1 => 
                   array (
                     'name' => 'about',
                     'url' => '/about',
@@ -55,13 +55,13 @@ class CrispusTest extends PHPUnit_Framework_TestCase
                     array (
                       'title' => 'About Crispus CMS',
                       'menu' => 'true',
-                      'sorting' => '2',
+                      'sorting' => '1',
                     ),
                     'children' => 
                     array (
                     ),
                   ),
-                  3 => 
+                  2 => 
                   array (
                     'name' => '404',
                     'url' => '/404',
@@ -69,6 +69,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
                     array (
                       'title' => 'Page not found',
                       'menu' => 'false',
+                      'sorting' => '2',
                     ),
                     'children' => 
                     array (
@@ -101,7 +102,7 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 	    
 	    // Test Page->getConfig()
 	    $aConfig = $oPage->getConfig();
-	    $aExpected = array('title' => "About Crispus CMS", 'menu' => "true", 'sorting' => "2");
+	    $aExpected = array('title' => "About Crispus CMS", 'menu' => "true", 'sorting' => "1");
 	    sort($aConfig);
 	    sort($aExpected);
 	    $this->assertEquals($aExpected, $aConfig);
