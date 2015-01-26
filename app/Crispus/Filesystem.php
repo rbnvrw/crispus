@@ -53,6 +53,42 @@ class Filesystem {
 	    return $aDirs;
 	}
 	
+	public function getAllPagesInDir($sPath, $sUrl, $sGlobalConfigFile, $sSortKey = 'sorting', $bAsc = true){				
+		$aDirs = $this->getDirectories($sPath, false);
+		
+		if(empty($sSortKey)){
+		    $sSortKey = 'sorting';
+		}
+		
+		if($bAsc !== false){
+		    $bAsc = true;
+		}
+		
+		$aPages = array();
+	    
+	    foreach($aDirs as $sDir){
+	    
+			$sNewUrl = $sUrl.'/'.$sDir;
+			
+			$oPage = new Page($sNewUrl, $sGlobalConfigFile);
+			$aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
+			
+			if(isset($aConfig[$sSortKey]) && !empty($aConfig[$sSortKey])){
+			    $aPages[$aConfig[$sSortKey]] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
+			}else{
+			    $aPages[] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
+			}		
+		}
+		
+		if($bAsc === false){
+		    krsort($aPages);
+		}else{
+		    ksort($aPages);
+		}
+		
+		return $aPages;
+	}
+	
 	public function getFileContents($sPath) {
 		// Read contents
 		if(file_exists($sPath)){

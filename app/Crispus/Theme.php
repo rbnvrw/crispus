@@ -20,6 +20,7 @@ class Theme {
 	private $aBlocks;
 	private $aAssets;
 	private $aPageList;
+	private $aChildren;
 	
 	private $aRenderedBlocks;
 	private $aRenderedAssets;
@@ -65,6 +66,10 @@ class Theme {
 		$this->aPageList = $aPageList;
 	}
 	
+	public function setChildren($aChildren) {
+		$this->aChildren = $aChildren;
+	}
+	
 	private function renderBlocks(){
 		$this->aRenderedBlocks = array();
 		
@@ -89,28 +94,31 @@ class Theme {
 		if(empty($this->aRenderedBlocks)){
 			$this->renderBlocks();
 		}
-		$aVars['blocks'] = $this->aRenderedBlocks;
 		
 		// Add assets
 		if(empty($this->aRenderedAssets)){
 			$this->renderAssets();
 		}
-		$aVars['assets'] = $this->aRenderedAssets;
 		
-		// Page config
-		$aVars['page'] = $this->aPageConfig;
-		
-		// Global site config
-		$aVars['site'] = $this->_oConfig->get('site');
-		
-		// Page list
-		$aVars['pages'] = $this->aPageList;
+		// Add twig variables
+		$aVars = array(
+		    'assets' => $this->aRenderedAssets,
+		    'blocks' => $this->aRenderedBlocks,
+		    'children' => $this->aChildren,
+		    'page' => $this->aPageConfig,
+		    'pages' => $this->aPageList,
+		    'site' => $this->_oConfig->get('site')
+		);
 		
 		$sThemePath = $this->_oConfig->getPath('themes').'/' . $this->sTheme . '/';
 		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
 		$oTwig = new \Twig_Environment($oLoader, $this->_oConfig->get('twig'));
+		
+		if($this->_oConfig->get('twig', 'debug') == true){
+		    $oTwig->addExtension(new \Twig_Extension_Debug());
+		}
 		
 		return $oTwig->render($this->sTemplate.'.html', $aVars);
 	}

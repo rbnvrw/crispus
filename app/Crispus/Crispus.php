@@ -61,31 +61,20 @@ class Crispus {
 		$oTheme->setTemplate($oPage->getTemplate());
 		$oTheme->addBlocks($oPage->getBlocks());
 		$oTheme->addAssets($oPage->getAssets());
+		$oTheme->setChildren($oPage->getChildren());
 
 		// Add page list for menus
-		$oTheme->setPageList($this->getAllPages());
+		// Sort dirs based on config
+		$sSortKey = $this->_oConfig->get('site', 'menu', 'sort_by');
+		$bAsc = $this->_oConfig->get('site', 'menu', 'sort_asc');
+		$sPath = $this->_oConfig->getPath('pages');
+		
+		$oFilesystem = new Filesystem();
+		$oTheme->setPageList($oFilesystem->getAllPagesInDir($sPath, '', $this->sConfigFile, $sSortKey, $bAsc));
 		
 		return $oTheme->renderPage();		
 	}
 	
-	private function getAllPages(){
-		return $this->getAllPagesInDir('/');
-	}
 	
-	private function getAllPagesInDir($sUrl){
-		$oFilesystem = new Filesystem();
-		$aPages = array();
-		
-		$aDirs = $oFilesystem->getDirectories($this->_oConfig->getPath('pages').$sUrl, false);
-		
-		foreach($aDirs as $sDir){
-			$oPage = new Page($sUrl.$sDir, $this->sConfigFile);
-			$aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
-			
-			$aPages[] = array('url' => $sUrl.$sDir, 'config' => $aConfig, 'children' => $this->getAllPagesInDir($sUrl.$sDir));
-		}
-		
-		return $aPages;
-	}
 
 }

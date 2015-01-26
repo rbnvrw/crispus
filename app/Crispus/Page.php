@@ -15,6 +15,7 @@ class Page {
 	private $sPath;
 	
 	private $sConfigFile = "config.json";
+	private $sGlobalConfigFile;
 
 	private $sUrl;
 	private $sType = "default";
@@ -28,6 +29,7 @@ class Page {
     {
 		// Init global config
 		$this->_oGlobalConfig = new SiteConfig($sGlobalConfigFile);
+		$this->sGlobalConfigFile = $sGlobalConfigFile;
 		
 		// Set URL
 		$this->sUrl = $sUrl;
@@ -70,10 +72,19 @@ class Page {
 		return $this->sTemplate;
 	}
 	
+	public function getChildren(){
+	    $oFilesystem = new Filesystem();	
+	    
+	    $sSortKey = $this->_oGlobalConfig->get('site', 'menu', 'sort_by');
+		$bAsc = $this->_oGlobalConfig->get('site', 'menu', 'sort_asc');
+	    			
+		return $oFilesystem->getAllPagesInDir($this->sPath, $this->sUrl, $this->sGlobalConfigFile, $sSortKey, $bAsc);
+	}
+	
 	private function setPath(){		
 		// Get the path to this page's file
 		$sPageDir = $this->_oGlobalConfig->getPath('pages') . '/';
-        $this->sPath =  $sPageDir . $this->sUrl;
+        $this->sPath =  $sPageDir . ltrim($this->sUrl, '/');
 	
         // Check if it is a directory
 		if(!is_dir($this->sPath)) {
@@ -86,9 +97,9 @@ class Page {
 		if(empty($this->sPath)){
 			$this->setPath();
 		}
-	
+	    
 		$oPageConfig = new Config($this->sPath.'/'.$this->sConfigFile);
-		$this->aConfig = $oPageConfig->getConfig();
+		$this->aConfig = array_change_key_case($oPageConfig->getConfig(), CASE_LOWER);
 		
 		// Set page template
 		if(isset($this->aConfig['template']) && !empty($this->aConfig['template'])){
