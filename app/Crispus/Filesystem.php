@@ -74,7 +74,7 @@ class Filesystem {
 			$aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
 			
 			if(isset($aConfig[$sSortKey]) && !empty($aConfig[$sSortKey])){
-			    $aPages[$aConfig[$sSortKey]] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
+			    $aPages[(string)$aConfig[$sSortKey]] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
 			}else{
 			    $aPages[] = array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
 			}		
