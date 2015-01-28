@@ -50,6 +50,12 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test SiteConfig->getPath()
 		$this->assertEquals($this->sRootPath.'/vendor', $oConfig->getPath('vendor'));		
 	}
+	
+	public function testConfig(){
+	    // Mal-formed json file
+	    $this->setExpectedException('\Crispus\BadConfigException');
+	    $oConfig = new Crispus\Config($this->sRootPath.'/tests/resources/config/malformed.json'); 
+	}
 
 	public function testPage(){
 	    $oPage = new Crispus\Page('/about', $this->sRootPath.'/tests/resources/config/test_site_config.json');

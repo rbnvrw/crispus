@@ -13,6 +13,12 @@
 	    <meta name="author" content="{{ page.author }}"> 
     {% endif %}
     
+    {% if assets.css %}
+	    {% for stylesheet in assets.css %}
+		    <link href="{{ stylesheet|e }}" type="text/css" rel="stylesheet">
+		{% endfor %}
+	{% endif %}
+    
     <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
         
   </head>
@@ -24,6 +30,12 @@
         {{ blocks.content }}
     </div> <!-- /container -->
     {% endblock %}
+    
+    {% if assets.js %}
+        {% for scriptfile in assets.js %}
+		    <script src="{{ scriptfile|e }}"></script>
+		{% endfor %}
+	{% endif %}
     
   </body>
 </html>

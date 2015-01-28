@@ -11,8 +11,7 @@
 			"sort_by": "sorting"
 		},
 		"render_content_page_list": false,
-		"base_url": "http://rubenverweij.nl",
-		"assets": ["css/style.css"]
+		"base_url": "http://rubenverweij.nl"
     },
 	"twig": {
 		"cache": false,
@@ -28,5 +27,5 @@
 			"vendor": "/vendor"
 		}
 	},
-	"request_uri": "/index"
+	"request_uri": "/index",,
 }

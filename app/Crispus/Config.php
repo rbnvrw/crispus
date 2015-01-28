@@ -24,10 +24,10 @@ class Config {
 			$this->_aConfig = json_decode($sContents, true);
 			
 			if(empty($this->_aConfig)){
-			    throw new \Exception(sprintf($this->sError, $sConfigFile, $this->getJSONError(json_last_error())));
+			    throw new BadConfigException(sprintf($this->sError, $sConfigFile, $this->getJSONError(json_last_error())));
 			}
 		}else{
-			$this->_aConfig = array();
+			throw new BadConfigException("Config file is empty: ".$sConfigFile);
 		}        
     }
 	
