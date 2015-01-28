@@ -43,7 +43,7 @@ class Block {
 	
 	private function processMarkdown($sContent){
 	    // Base URL
-		$this->aVars['base_url'] = $this->_oConfig->getBaseUrl();
+		$this->aVars['base_url'] = rtrim($this->_oConfig->getBaseUrl(),'/');
 		
 		// Simple variable replacement
 		foreach($this->aVars as $sName => $sVar){

@@ -22,6 +22,10 @@ class Filesystem {
 	{
 	    $aFiles = array();
 	    
+	    if(!is_dir($sDirectory)){
+			return null;
+		}
+	    
 	    foreach(new \DirectoryIterator($sDirectory) as $oFileInfo){
 	        if($oFileInfo->isFile()){
 	            if(empty($sExt) || $sExt == $oFileInfo->getExtension()){

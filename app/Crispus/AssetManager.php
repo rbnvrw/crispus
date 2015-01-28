@@ -17,17 +17,25 @@ class AssetManager {
 	private $aFilters;
 	
 	private $sThemePath;
+	private $sAssetPath;
+	private $sThemeUrl;
+	private $sAssetUrl;
 
 	public function __construct($sConfigFile = 'config.json')
     {
-		$this->_oConfig = new SiteConfig($sConfigFile);		
 		$this->aAssets = array();
+		$this->_oConfig = new SiteConfig($sConfigFile);		
+		
+		$this->sAssetPath = $this->_oConfig->getPath('assets');
 		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
 		
-		$this->addAssets($this->_oConfig->get('site', 'assets'), 'global');
+		$this->sAssetUrl = $this->_oConfig->getUrl('assets');
+		$this->sThemeUrl = $this->_oConfig->getUrl('themes').'/'.$this->_oConfig->get('site','theme');
+		
+		$this->addAssets($this->_oConfig->get('site', 'assets'));
 	}
 	
-	public function addAssets($aAssets, $sType = 'file'){	
+	public function addAssets($aAssets){	
 		if(!is_array($aAssets)){
 			return;
 		}
@@ -35,7 +43,7 @@ class AssetManager {
 		foreach($aAssets as $sAsset){
 			$sExt = pathinfo($sAsset, PATHINFO_EXTENSION);
 			
-			$this->addAsset($sAsset, $sExt, $sType);
+			$this->addAsset($sAsset, $sExt);
 		}
 	}
 	
@@ -43,26 +51,6 @@ class AssetManager {
 		if(empty($this->aAssets)){
 			return null;
 		}
-		
-		// Create the asset manager
-		$oManager = new \Assetic\AssetManager();
-		
-		// Add all the assets
-		foreach($this->aAssets as $sType => $aAssets){
-			$oCollection = new \Assetic\Asset\AssetCollection($aAssets);
-			$oCollection->setTargetPath('assets.'.$sType);
-			$oManager->set($sType, $oCollection);
-		}
-		
-		// Create the asset factory
-		$oFactory = new \Assetic\Factory\AssetFactory($this->sThemePath);
-		$oFactory->setAssetManager($oManager);
-		$oFactory->addWorker(new \Assetic\Factory\Worker\CacheBustingWorker());
-		
-		// Write assets to files
-		$sCachePath = $this->_oConfig->getPath('cache');
-		$oWriter = new \Assetic\AssetWriter($sCachePath);
-		$oWriter->writeManagerAssets($oManager);
 
 		return $this->getAssets();		
 	}
@@ -70,69 +58,37 @@ class AssetManager {
 	private function getAssets(){
 		$aAssets = array();
 		
-		foreach($this->aAssets as $sType => $aAssetObjects){
-			$sUrl = $this->getAssetUrl($sType);
+		foreach($this->aAssets as $aAsset){			
+			if(!empty($aAsset['url'])){
+			    if(!isset($aAssets[$aAsset['type']]) || !is_array($aAssets[$aAsset['type']])){
+			        $aAssets[$aAsset['type']] = array();
+			    }
 			
-			if(!empty($sUrl)){
-				$aAssets[$sType] = $sUrl;
+				$aAssets[$aAsset['type']][] = $aAsset['url'];
 			}
 		}
 		
 		return $aAssets;		
 	}
 	
-	private function getAssetUrl($sType){
-		if(empty($sType)){
-			return null;
-		}
-		
-		$sPath = $this->_oConfig->getPath('cache') . '/' . 'assets.' . $sType;
-		
-		if(file_exists($sPath)){
-			return $this->_oConfig->getUrl('cache') . '/' . 'assets.' . $sType;
-		}
-		
-		return null;
-	}
-	
-	private function addAsset($sPath, $sExt, $sType = 'file'){
-		if(!isset($this->aAssets[$sExt]) || !is_array($this->aAssets[$sExt])){
-			$this->aAssets[$sExt] = array();
-		}
-		
+	private function addAsset($sPath, $sExt){	
 		if(substr($sPath, 0, 1) == '/'){		
-			$sPath = $this->_oConfig->getPath('root') . $sPath;		
+			$sNewPath = $this->_oConfig->getPath('root') . $sPath;		
+			$sUrl = $this->_oConfig->getBaseUrl() . $sPath;
 		}else{
-			$sPath = $this->sThemePath . '/' . $sPath;
+			$sNewPath = $this->sThemePath . '/' . $sPath;
+			$sUrl = $this->sThemeUrl . '/' . $sPath;
+            if(!file_exists($sNewPath)){
+                $sNewPath = $this->sAssetPath . '/' . $sPath;
+                $sUrl = $this->sAssetUrl . '/' . $sPath;
+                if(!file_exists($sNewPath)){
+                    return;
+                }
+            }
+			
 		}
 		
-		if($sType == 'global'){
-			$this->aAssets[$sExt][] = new \Assetic\Asset\GlobAsset($sPath, $this->getFilters($sExt));
-		}else{
-			$this->aAssets[$sExt][] = new \Assetic\Asset\FileAsset($sPath, $this->getFilters($sExt));
-		}
-	}
-	
-	private function initFilters() {
-		$this->aFilters = array();
-	}
-	
-	private function getFilters($sExt){
-		$aFilters = array();
-		
-		if(empty($this->aFilters)){
-			$this->initFilters();
-		}
-		
-		if(isset($this->aFilters[$sExt])){
-					
-			foreach($this->aFilters[$sExt] as $sFilter){
-				$sClassName = '\\Assetic\\Filter\\' . $sFilter;
-				$aFilters[] = new $sClassName();
-			}
-		}
-		
-		return $aFilters;
+		$this->aAssets[] = array('path' => $sNewPath, 'url' => $sUrl, 'type' => $sExt);
 	}
 	
 }

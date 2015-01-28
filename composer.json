@@ -13,8 +13,7 @@
     "require": {
         "php": "*",
         "twig/twig": "*",
-        "michelf/php-markdown": "*",
-		"kriswallsmith/assetic": "*"
+        "michelf/php-markdown": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "*",

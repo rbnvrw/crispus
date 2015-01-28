@@ -13,6 +13,7 @@ namespace Crispus;
 class Config {
 
 	protected $_aConfig;
+	protected $sError = "There was an error decoding the config file %s. JSON error: %s";
 	    
     public function __construct($sConfigFile = 'config.json'){
                
@@ -21,6 +22,10 @@ class Config {
 		
 		if(!empty($sContents)){
 			$this->_aConfig = json_decode($sContents, true);
+			
+			if(empty($this->_aConfig)){
+			    throw new \Exception(sprintf($this->sError, $sConfigFile, $this->getJSONError(json_last_error())));
+			}
 		}else{
 			$this->_aConfig = array();
 		}        
@@ -54,4 +59,29 @@ class Config {
 		return $this->_aConfig;
 	}
 	
+	protected function getJSONError($iError){
+	    switch ($iError) {
+            case JSON_ERROR_NONE:
+                return 'Success';
+            break;
+            case JSON_ERROR_DEPTH:
+                return 'Maximum stack depth exceeded';
+            break;
+            case JSON_ERROR_STATE_MISMATCH:
+                return 'Underflow or the modes mismatch';
+            break;
+            case JSON_ERROR_CTRL_CHAR:
+                return 'Unexpected control character found';
+            break;
+            case JSON_ERROR_SYNTAX:
+                return 'Syntax error, malformed JSON';
+            break;
+            case JSON_ERROR_UTF8:
+                return 'Malformed UTF-8 characters, possibly incorrectly encoded';
+            break;
+            default:
+                return 'Unknown error';
+            break;
+        }
+	}
 }

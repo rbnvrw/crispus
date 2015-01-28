@@ -61,6 +61,10 @@ class Page {
 	}
 	
 	public function getAssets(){
+	    if(empty($this->aAssets)){
+			$this->setAssets();
+		}
+		
 		return $this->aAssets;
 	}
 	
@@ -98,7 +102,7 @@ class Page {
 		$aConfig = $oPageConfig->getConfig();
 		
 		if(is_array($aConfig)){
-		    $this->aConfig = array_change_key_case($oPageConfig->getConfig(), CASE_LOWER);
+		    $this->aConfig = array_change_key_case($aConfig, CASE_LOWER);
 		}else{
 		    $this->aConfig = array();
 		}
@@ -131,6 +135,11 @@ class Page {
 	
 	private function set404Page(){
 		$this->sType = "404";
+		
+		// Set path
+		$sPageDir = $this->_oGlobalConfig->getPath('pages') . '/';
+        $this->sPath =  $sPageDir . ltrim($this->_oGlobalConfig->get('site', 'not_found_page'), '/');
+		
 	}
 
 }
