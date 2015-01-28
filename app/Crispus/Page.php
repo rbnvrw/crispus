@@ -95,7 +95,13 @@ class Page {
 		}
 	    
 		$oPageConfig = new Config($this->sPath.'/'.$this->sConfigFile);
-		$this->aConfig = array_change_key_case($oPageConfig->getConfig(), CASE_LOWER);
+		$aConfig = $oPageConfig->getConfig();
+		
+		if(is_array($aConfig)){
+		    $this->aConfig = array_change_key_case($oPageConfig->getConfig(), CASE_LOWER);
+		}else{
+		    $this->aConfig = array();
+		}
 		
 		// Set page template
 		if(isset($this->aConfig['template']) && !empty($this->aConfig['template'])){

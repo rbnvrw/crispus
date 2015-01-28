@@ -46,7 +46,11 @@ class Theme {
 	
 	public function setPageConfig($aConfig) {
 		if(is_array($aConfig)){
-			$this->aPageConfig = array_change_key_case($aConfig, CASE_LOWER);
+			if(is_array($aConfig)){
+		        $this->aPageConfig = array_change_key_case($aConfig, CASE_LOWER);
+		    }else{
+		        $this->aPageConfig = array();
+		    }
 		}
 	}
 	

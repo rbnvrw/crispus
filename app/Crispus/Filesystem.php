@@ -92,7 +92,13 @@ class Filesystem {
 	    $sNewUrl = $sUrl.'/'.$sDir;
 		    
 	    $oPage = new Page($sNewUrl, $sGlobalConfigFile);
-	    $aConfig = array_change_key_case($oPage->getConfig(), CASE_LOWER);
+	    $aConfig = $oPage->getConfig();
+		
+		if(is_array($aConfig)){
+		    $aConfig = array_change_key_case($aConfig, CASE_LOWER);
+		}else{
+		    $aConfig = array();
+		}
 	
 	    return array('name' => $sDir, 'url' => $sNewUrl, 'config' => $aConfig, 'children' => $oPage->getChildren());
 	}
