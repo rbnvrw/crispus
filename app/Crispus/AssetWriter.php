@@ -11,14 +11,48 @@ namespace Crispus;
  */
 class AssetWriter extends \Assetic\AssetWriter {
 
-    protected static function write($path, $contents)
+    protected static $iMaxTimeDiff = 3600;
+
+    protected static function write($sPath, $sContents)
     {
-        if (!is_dir($dir = dirname($path)) && false === @mkdir($dir, 0777, true)) {
-            throw new \RuntimeException('Unable to create directory '.$dir);
+        // Check if dir exists, if not, create it
+        self::checkDir($sPath);
+        
+        // Check if file already exist
+        if(!file_exists($sPath)){
+            self::writeToFile($sPath, $sContents);
+        }elseif(self::getModificationTimeDiff($sPath) >= self::$iMaxTimeDiff){
+            self::writeToFile($sPath, $sContents);
+        }        
+        
+    }
+    
+    protected static function checkDir($sPath){
+        $sDir = dirname($sPath);
+        
+        if (!is_dir($sDir) && false === @mkdir($sDir, 0777, true)) {
+            throw new \RuntimeException('AssetWriter: Unable to create directory '.$sDir);
         }
         
-        if (false === @file_put_contents($path, $contents)) {
-            throw new \RuntimeException('Unable to write file '.$path);
+        return true;
+    }
+    
+    protected static function writeToFile($sPath, $sContents){
+        if (false === @file_put_contents($sPath, $sContents)) {
+            throw new \RuntimeException('AssetWriter: Unable to write file '.$sPath);
+        }
+        
+        return true;
+    }
+    
+    protected static function getModificationTimeDiff($sPath){        
+        try{
+            $iModTime = filemtime($sPath);
+            clearstatcache(); 
+            
+            return time() - $iModTime;
+        }catch(\Exception $e){
+            return self::$iMaxTimeDiff+1;    
         }
     }
 

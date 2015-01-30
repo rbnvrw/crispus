@@ -11,9 +11,10 @@ namespace Crispus;
  */
 class Crispus {
 		
-	public $_oConfig;
-	
+	public $_oConfig;	
 	private $sConfigFile;
+	
+	private $aHeaders;
 
     public function __construct($sConfigFile = 'config.json')
     {                   
@@ -73,7 +74,5 @@ class Crispus {
 		
 		return $oTheme->renderPage();		
 	}
-	
-	
 
 }

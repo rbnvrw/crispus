@@ -3,6 +3,8 @@ namespace Crispus;
 
 use \Assetic\Asset\AssetCollection;
 use \Assetic\Asset\FileAsset;
+use \Assetic\Asset\AssetCache;
+use \Assetic\Cache\FilesystemCache;
 
 /**
  * Crispus CMS
@@ -35,26 +37,19 @@ class AssetManager {
 		$this->oAssetManager = new \Assetic\AssetManager();
 		
 		// Add global assets
-		$this->addAssets($this->_oConfig->get('site', 'assets'), 'global_assets');
+		$this->addAssets($this->_oConfig->get('site', 'assets'));
 	}
 	
-	public function addAssets($aAssets, $sName){	
+	public function addAssets($aAssets){	
 		if(!is_array($aAssets)){
 			return;
 		}
-		
-		// Get collection name for writing the file
-		$sCollectionName = trim(preg_replace("/[^a-z0-9]/i", "_", $sName), '_');
-		
-		if(empty($sCollectionName)){
-		    $sCollectionName = 'index';
-		}
-	    
-	    // Sort and add path
+		    
+	    // Sort and add path, name collection
 	    $aAssets = $this->prepareAssets($aAssets);
 		
 		// Add assets to the asset manager
-		$this->addToAssetManager($aAssets, $sCollectionName);
+		$this->addToAssetManager($aAssets);
 		
 	}
 	
@@ -74,7 +69,8 @@ class AssetManager {
 	
 	private function prepareAssets($aAssets){
 	    // Sort assets on type
-	    $aAssetArray = array();	    
+	    $aAssetArray = array();
+	    $sName = '';	    
 		foreach($aAssets as $sAsset){
 			$sExt = pathinfo($sAsset, PATHINFO_EXTENSION);
 			
@@ -86,33 +82,40 @@ class AssetManager {
 			
 			if(file_exists($sFile)){
 			    $aAssetArray[$sExt][] = $sFile;
+			    $sName .= '_'.pathinfo($sAsset, PATHINFO_BASENAME);
 			}
 		}
 		
-		return $aAssetArray;
+		$sName = md5($sName);
+		
+		return array($sName => $aAssetArray);
 	}
 	
-	private function addToAssetManager($aAssets, $sName){
-	    // Build asset array	    
-	    foreach($aAssets as $sType => $aFiles){
-	    
-	        $aCollection = array();
-	    
-	        foreach($aFiles as $sFile){
-	            $aCollection[] = new FileAsset($sFile);
-	        }
+	private function addToAssetManager($aAssets){
+	    // Build asset array
+	    foreach($aAssets as $sName => $aAssetGroup){	    
+	        foreach($aAssetGroup as $sType => $aFiles){
 	        
-	        $oCollection = new AssetCollection($aCollection);	        
-	        $oCollection->setTargetPath($sName.'.'.$sType);
+	            $aCollection = array();
 	        
-	        $this->oAssetManager->set($sName.'_'.$sType, $oCollection);
-	        
-	        // Add to list of assets
-	        if(!isset($this->aAssetFiles[$sType])){
-			    $this->aAssetFiles[$sType] = array();
-			}
+	            foreach($aFiles as $sFile){
+	                $aCollection[] = new AssetCache(
+	                    new FileAsset($sFile, $this->getFilters($sType)),
+	                    new FilesystemCache($this->sCachePath));
+	            }
+	            
+	            $oCollection = new AssetCollection($aCollection);	        
+	            $oCollection->setTargetPath($sName.'.'.$sType);
+	            
+	            $this->oAssetManager->set($sName.'_'.$sType, $oCollection);
+	            
+	            // Add to list of assets
+	            if(!isset($this->aAssetFiles[$sType])){
+			        $this->aAssetFiles[$sType] = array();
+			    }
 			
-			$this->aAssetFiles[$sType][] = $this->sCacheUrl.'/'.trim($sName.'.'.$sType, '/');
+			    $this->aAssetFiles[$sType][] = $this->sCacheUrl.'/'.trim($sName.'.'.$sType, '/');
+	        }
 	    }
 	    
 	}
@@ -125,6 +128,18 @@ class AssetManager {
 		// Theme path
 		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
 		$this->sThemeUrl = $this->_oConfig->getUrl('themes').'/'.$this->_oConfig->get('site','theme');
+	}
+	
+	private function getFilters($sType){
+	    if($sType == 'js'){
+	        return array(new \Assetic\Filter\JSqueezeFilter());
+	    }
+	    
+	    if($sType == 'css'){
+	        return array(new \Assetic\Filter\CssRewriteFilter(), new \Assetic\Filter\CssMinFilter());
+	    }
+	    
+	    return array();
 	}
 	
 }

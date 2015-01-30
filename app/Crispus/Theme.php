@@ -86,7 +86,7 @@ class Theme {
 	
 	private function renderAssets(){
 		$oAssetManager = new AssetManager($this->sConfigFile);
-		$oAssetManager->addAssets($this->aAssets, $this->sTemplate);
+		$oAssetManager->addAssets($this->aAssets);
 		$this->aRenderedAssets = $oAssetManager->getAssetPaths();
 	}
 
