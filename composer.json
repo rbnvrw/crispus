@@ -11,9 +11,11 @@
         }
     ],
     "require": {
-        "php": "*",
-        "twig/twig": "*",
-        "michelf/php-markdown": "*"
+        "php": ">=5.3",
+        "twig/twig": "~1.18",
+        "michelf/php-markdown": "~1.4",
+        "kriswallsmith/assetic": "~1.1",
+        "patchwork/jsqueeze": "~2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
