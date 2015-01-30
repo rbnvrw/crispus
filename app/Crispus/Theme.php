@@ -86,8 +86,8 @@ class Theme {
 	
 	private function renderAssets(){
 		$oAssetManager = new AssetManager($this->sConfigFile);
-		$oAssetManager->addAssets($this->aAssets);
-		$this->aRenderedAssets = $oAssetManager->render();
+		$oAssetManager->addAssets($this->aAssets, $this->sTemplate);
+		$this->aRenderedAssets = $oAssetManager->getAssetPaths();
 	}
 
 	private function runTwig(){

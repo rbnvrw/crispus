@@ -1,6 +1,9 @@
 <?php
 namespace Crispus;
 
+use \Assetic\Asset\AssetCollection;
+use \Assetic\Asset\FileAsset;
+
 /**
  * Crispus CMS
  *
@@ -11,84 +14,117 @@ namespace Crispus;
  */
 class AssetManager {
 
-	public $_oConfig;
+	private $_oConfig;	
 	
-	private $aAssets;
-	private $aFilters;
+	private $oAssetManager;	
+	private $aAssetFiles;
 	
-	private $sThemePath;
-	private $sAssetPath;
+	private $sThemePath;	
 	private $sThemeUrl;
-	private $sAssetUrl;
+	
+	private $sCachePath;
+	private $sCacheUrl;
 
 	public function __construct($sConfigFile = 'config.json')
     {
 		$this->aAssets = array();
 		$this->_oConfig = new SiteConfig($sConfigFile);		
 		
-		$this->sAssetPath = $this->_oConfig->getPath('assets');
-		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
+		$this->setUrlsAndPaths();
 		
-		$this->sAssetUrl = $this->_oConfig->getUrl('assets');
-		$this->sThemeUrl = $this->_oConfig->getUrl('themes').'/'.$this->_oConfig->get('site','theme');
+		$this->oAssetManager = new \Assetic\AssetManager();
 		
-		$this->addAssets($this->_oConfig->get('site', 'assets'));
+		// Add global assets
+		$this->addAssets($this->_oConfig->get('site', 'assets'), 'global_assets');
 	}
 	
-	public function addAssets($aAssets){	
+	public function addAssets($aAssets, $sName){	
 		if(!is_array($aAssets)){
 			return;
 		}
+		
+		// Get collection name for writing the file
+		$sCollectionName = trim(preg_replace("/[^a-z0-9]/i", "_", $sName), '_');
+		
+		if(empty($sCollectionName)){
+		    $sCollectionName = 'index';
+		}
+	    
+	    // Sort and add path
+	    $aAssets = $this->prepareAssets($aAssets);
+		
+		// Add assets to the asset manager
+		$this->addToAssetManager($aAssets, $sCollectionName);
+		
+	}
 	
+	public function getAssetPaths(){
+	
+	    $this->createFiles();
+	    return $this->aAssetFiles;
+	        
+	}
+	
+	private function createFiles(){
+
+	    $oWriter = new AssetWriter($this->sCachePath);
+        $oWriter->writeManagerAssets($this->oAssetManager);  
+          
+	}
+	
+	private function prepareAssets($aAssets){
+	    // Sort assets on type
+	    $aAssetArray = array();	    
 		foreach($aAssets as $sAsset){
 			$sExt = pathinfo($sAsset, PATHINFO_EXTENSION);
 			
-			$this->addAsset($sAsset, $sExt);
-		}
-	}
-	
-	public function render(){
-		if(empty($this->aAssets)){
-			return null;
-		}
-
-		return $this->getAssets();		
-	}
-	
-	private function getAssets(){
-		$aAssets = array();
-		
-		foreach($this->aAssets as $aAsset){			
-			if(!empty($aAsset['url'])){
-			    if(!isset($aAssets[$aAsset['type']]) || !is_array($aAssets[$aAsset['type']])){
-			        $aAssets[$aAsset['type']] = array();
-			    }
+			if(!isset($aAssetArray[$sExt])){
+			    $aAssetArray[$sExt] = array();
+			}			
 			
-				$aAssets[$aAsset['type']][] = $aAsset['url'];
+			$sFile = $this->sThemePath.'/'.trim($sAsset, '/');
+			
+			if(file_exists($sFile)){
+			    $aAssetArray[$sExt][] = $sFile;
 			}
 		}
 		
-		return $aAssets;		
+		return $aAssetArray;
 	}
 	
-	private function addAsset($sPath, $sExt){	
-		if(substr($sPath, 0, 1) == '/'){		
-			$sNewPath = $this->_oConfig->getPath('root') . $sPath;		
-			$sUrl = $this->_oConfig->getBaseUrl() . $sPath;
-		}else{
-			$sNewPath = $this->sThemePath . '/' . $sPath;
-			$sUrl = $this->sThemeUrl . '/' . $sPath;
-            if(!file_exists($sNewPath)){
-                $sNewPath = $this->sAssetPath . '/' . $sPath;
-                $sUrl = $this->sAssetUrl . '/' . $sPath;
-                if(!file_exists($sNewPath)){
-                    return;
-                }
-            }
+	private function addToAssetManager($aAssets, $sName){
+	    // Build asset array	    
+	    foreach($aAssets as $sType => $aFiles){
+	    
+	        $aCollection = array();
+	    
+	        foreach($aFiles as $sFile){
+	            $aCollection[] = new FileAsset($sFile);
+	        }
+	        
+	        $oCollection = new AssetCollection($aCollection);	        
+	        $oCollection->setTargetPath($sName.'.'.$sType);
+	        
+	        $this->oAssetManager->set($sName.'_'.$sType, $oCollection);
+	        
+	        // Add to list of assets
+	        if(!isset($this->aAssetFiles[$sType])){
+			    $this->aAssetFiles[$sType] = array();
+			}
 			
-		}
-		
-		$this->aAssets[] = array('path' => $sNewPath, 'url' => $sUrl, 'type' => $sExt);
+			$this->aAssetFiles[$sType][] = $this->sCacheUrl.'/'.trim($sName.'.'.$sType, '/');
+	    }
+	    
+	}
+	
+	private function setUrlsAndPaths(){
+	    // Cache path where assets are stored
+	    $this->sCachePath = $this->_oConfig->getPath('cache');
+		$this->sCacheUrl = $this->_oConfig->getUrl('cache');
+	
+		// Theme path
+		$this->sThemePath = $this->_oConfig->getPath('themes').'/'.$this->_oConfig->get('site','theme');
+		$this->sThemeUrl = $this->_oConfig->getUrl('themes').'/'.$this->_oConfig->get('site','theme');
 	}
 	
 }
