@@ -28,19 +28,17 @@ class SiteConfig extends Config {
                 
         $this->_aConfig['http_host'] = (isset($this->_aConfig['http_host'])) ? $this->_aConfig['http_host'] : filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
 		
-		$this->_aConfig['site']['base_url'] = (isset($this->_aConfig['site']['base_url'])) ? $this->_aConfig['site']['base_url'] : '/';
+		$this->_aConfig['site']['base_url'] = (isset($this->_aConfig['site']['base_url'])) ? $this->_aConfig['site']['base_url'] : $this->getProtocol().'://'.filter_input(INPUT_SERVER, 'SERVER_NAME', FILTER_SANITIZE_URL).'/';
                 
         $this->getProtocol();
 	}
 	
 	public function getProtocol() {
-		if(!isset($this->_aConfig['protocol'])){
-			$sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
-            if($sHttps != 'off'){
-		        $this->_aConfig['protocol'] = 'https';
-	        }else{
-	            $this->_aConfig['protocol'] = 'http';
-	        }
+		$sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
+		if($sHttps === 'on'){
+			$this->_aConfig['protocol'] = 'https';
+		}else{
+			$this->_aConfig['protocol'] = 'http';
 		}
 		return $this->_aConfig['protocol'];
 	}

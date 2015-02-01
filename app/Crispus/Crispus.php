@@ -65,6 +65,7 @@ class Crispus {
 		$oTheme->addBlocks($oPage->getBlocks());
 		$oTheme->addAssets($oPage->getAssets());
 		$oTheme->setChildren($oPage->getChildren());
+		$oTheme->setUrl($this->determineUrl());
 
 		// Add page list for menus
 		$sPath = $this->_oConfig->getPath('pages');

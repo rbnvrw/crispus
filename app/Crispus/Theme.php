@@ -22,6 +22,8 @@ class Theme {
 	private $aPageList;
 	private $aChildren;
 	
+	private $sUrl;
+	
 	private $aRenderedBlocks;
 	private $aRenderedAssets;
 
@@ -74,6 +76,10 @@ class Theme {
 		$this->aChildren = $aChildren;
 	}
 	
+	public function setUrl($sUrl) {
+		$this->sUrl = $sUrl;
+	}
+	
 	private function renderBlocks(){
 		$this->aRenderedBlocks = array();
 		
@@ -111,7 +117,8 @@ class Theme {
 		    'children' => $this->aChildren,
 		    'page' => $this->aPageConfig,
 		    'pages' => $this->aPageList,
-		    'site' => $this->_oConfig->get('site')
+		    'site' => $this->_oConfig->get('site'),
+			'url' => $this->sUrl
 		);
 		
 		$sThemePath = $this->_oConfig->getPath('themes').'/' . $this->sTheme . '/';
