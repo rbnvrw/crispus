@@ -16,7 +16,8 @@
         "michelf/php-markdown": "~1.4",
         "kriswallsmith/assetic": "dev-master",
         "patchwork/jsqueeze": "~2.0",
-        "natxet/CssMin": "~3.0"
+        "natxet/CssMin": "~3.0",
+        "creolab/image": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
