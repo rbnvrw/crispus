@@ -27,6 +27,8 @@ class Theme {
 	
 	private $aRenderedBlocks;
 	private $aRenderedAssets;
+	
+	private $aDefaultTwigSettings;
 
 	public function __construct($sTheme, $sConfigFile = 'config.json')
     {
@@ -130,13 +132,22 @@ class Theme {
 		
 		$oLoader = new \Twig_Loader_Filesystem($sThemePath);		
 		
-		$oTwig = new \Twig_Environment($oLoader, $this->_oConfig->get('twig'));
+		$oTwig = new \Twig_Environment($oLoader, $this->getTwigConfig($this->_oConfig->get('twig')));
 		
 		if($this->_oConfig->get('twig', 'debug') === true){
 		    $oTwig->addExtension(new \Twig_Extension_Debug());
 		}
 		
 		return $oTwig->render($this->sTemplate.'.html', $aVars);
+	}
+	
+	private function getTwigConfig($aSettings){
+	    $this->aDefaultTwigSettings = (!is_array($this->aDefaultTwigSettings)) ? array() : $this->aDefaultTwigSettings;
+        $aSettings = !(is_array($aSettings)) ? array() : $aSettings;
+        
+        $this->aDefaultTwigSettings['cache'] = $this->_oConfig->getPath('cache');
+
+        return array_replace_recursive($this->aDefaultTwigSettings, $aSettings);    
 	}
 
 }
