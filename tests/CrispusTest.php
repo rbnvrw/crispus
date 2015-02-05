@@ -41,12 +41,6 @@ class CrispusTest extends PHPUnit_Framework_TestCase
 		// Test Config->get()
 		$this->assertEquals('crisp', $oConfig->get('site', 'theme'));
 		
-		// Test SiteConfig->getBaseUrl()
-		$this->assertEquals('http://rubenverweij.nl/', $oConfig->getBaseUrl());
-		
-		// Test SiteConfig->getUrl()
-		$this->assertEquals('http://rubenverweij.nl/vendor', $oConfig->getUrl('vendor'));
-		
 		// Test SiteConfig->getPath()
 		$this->assertEquals($this->sRootPath.'/vendor', $oConfig->getPath('vendor'));		
 	}

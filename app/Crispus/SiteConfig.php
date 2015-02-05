@@ -22,25 +22,11 @@ class SiteConfig extends Config {
 	private function setup() {
 		$this->setRootPath();
         
-        $this->_aConfig['request_uri'] = (isset($this->_aConfig['request_uri'])) ? $this->_aConfig['request_uri'] : filter_input(INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL);
-                
-        $this->_aConfig['server_protocol'] = (isset($this->_aConfig['server_protocol'])) ? $this->_aConfig['server_protocol'] : filter_input(INPUT_SERVER, 'SERVER_PROTOCOL', FILTER_SANITIZE_STRING);
-                
-        $this->_aConfig['http_host'] = (isset($this->_aConfig['http_host'])) ? $this->_aConfig['http_host'] : filter_input(INPUT_SERVER, 'HTTP_HOST', FILTER_SANITIZE_URL);
-		
-		$this->_aConfig['site']['base_url'] = (isset($this->_aConfig['site']['base_url'])) ? $this->_aConfig['site']['base_url'] : $this->getProtocol().'://'.filter_input(INPUT_SERVER, 'SERVER_NAME', FILTER_SANITIZE_URL).'/';
-                
-        $this->getProtocol();
-	}
-	
-	public function getProtocol() {
-		$sHttps = filter_input(INPUT_SERVER, 'HTTPS', FILTER_SANITIZE_STRING);
-		if($sHttps === 'on'){
-			$this->_aConfig['protocol'] = 'https';
-		}else{
-			$this->_aConfig['protocol'] = 'http';
-		}
-		return $this->_aConfig['protocol'];
+        $this->_aConfig['request_uri'] = (isset($this->_aConfig['request_uri'])) ? $this->_aConfig['request_uri'] : $this->getServerVar('REQUEST_URI');
+        
+        $this->_aConfig['protocol'] = $this->getProtocol();
+        
+        $this->_aConfig['site']['base_url'] = $this->getBaseUrl();                
 	}
 	
 	public function getPath($sKey, $sGroup = 'crispus'){
@@ -60,19 +46,6 @@ class SiteConfig extends Config {
 		return $sRoot;
 	}
 	
-	public function getBaseUrl(){
-		$sBaseUrl = '/';
-		if(isset($this->_aConfig['site']['base_url'])){
-			$sBaseUrl = $this->_aConfig['site']['base_url'];
-		}
-		
-		if(substr($sBaseUrl, -1) !== '/'){
-			$sBaseUrl .= '/';
-		}
-		
-		return $sBaseUrl;
-	}
-	
 	public function getUrl($sKey, $sGroup = 'crispus'){
 		$sBaseUrl = $this->getBaseUrl();
 	
@@ -81,6 +54,27 @@ class SiteConfig extends Config {
 		}
 		
 		return $sBaseUrl;
+	}
+	
+	public function getProtocol() {
+	    $sProtocol = 'http';
+	
+		$sHttps = $this->getServerVar('HTTPS');
+		if($sHttps === 'on'){
+			$sProtocol = 'https';
+		}
+		return $sProtocol;
+	}
+	
+	public function getBaseUrl(){	    
+	    $sBaseUrl = sprintf('%s://%s:%d/', $this->getProtocol(),
+	                                        $this->getServerVar('SERVER_NAME'),
+	                                        $this->getServerVar('SERVER_PORT'));
+	    return $sBaseUrl; 	    
+	}
+	
+	public function getServerVar($sName){
+	    return filter_input(INPUT_SERVER, $sName, FILTER_SANITIZE_URL);
 	}
 	
 	private function setRootPath(){		
