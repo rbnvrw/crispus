@@ -16,7 +16,7 @@ class Block {
 	private $sPath;
 	private $aVars;
 	
-	private $sPhpThumbPath = 'james-heinrich/phpthumb/phpThumb.php';
+	private $sPhpThumbPath = 'rbnvrw/phpthumb/phpThumb.php';
 
 	public function __construct($sPath, $aVars = array(), $sConfigFile = 'config.json')
     {
