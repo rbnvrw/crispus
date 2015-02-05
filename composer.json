@@ -17,7 +17,7 @@
         "kriswallsmith/assetic": "dev-master",
         "patchwork/jsqueeze": "~2.0",
         "natxet/CssMin": "~3.0",
-        "creolab/image": "dev-master"
+        "masterexploder/phpthumb": "~2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
