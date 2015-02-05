@@ -77,6 +77,16 @@ class SiteConfig extends Config {
 	    return filter_input(INPUT_SERVER, $sName, FILTER_SANITIZE_URL);
 	}
 	
+	public function getPhpThumbUrl(){
+	    $sUrl = $this->getUrl('phpThumb');
+	    
+	    if($sUrl == $this->getBaseUrl()){
+	        $sUrl = $this->getUrl('vendor').'/rbnvrw/phpthumb/phpThumb.php';
+	    }
+	    
+	    return $sUrl;
+	}
+	
 	private function setRootPath(){		
 		if(!isset($this->_aConfig['crispus']['paths']['root'])){
 			/* Vendor directory is in the root, step up until we find vendor

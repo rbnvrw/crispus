@@ -125,7 +125,8 @@ class Theme {
 		    'page' => $this->aPageConfig,
 		    'pages' => $this->aPageList,
 		    'site' => $this->_oConfig->get('site'),
-			'url' => $this->sUrl
+			'url' => $this->sUrl,
+			'phpThumb' => $this->_oConfig->getPhpThumbUrl()
 		);
 		
 		$sThemePath = $this->_oConfig->getPath('themes').'/' . $this->sTheme . '/';
