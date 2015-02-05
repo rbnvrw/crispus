@@ -15,6 +15,8 @@ class Block {
 	
 	private $sPath;
 	private $aVars;
+	
+	private $sPhpThumbPath = 'james-heinrich/phpthumb/phpThumb.php';
 
 	public function __construct($sPath, $aVars = array(), $sConfigFile = 'config.json')
     {
@@ -41,9 +43,16 @@ class Block {
 		return basename($this->sPath, '.'.$sBlockExt);
 	}
 	
-	private function processMarkdown($sContent){
+	private function setMarkdownVars(){
 	    // Base URL
 		$this->aVars['base_url'] = rtrim($this->_oConfig->getBaseUrl(),'/');
+		
+		// phpThumb URL
+		$this->aVars['phpThumb'] = $this->_oConfig->getUrl('vendor').'/'.$this->sPhpThumbPath;
+	}
+	
+	private function processMarkdown($sContent){
+	    $this->setMarkdownVars();
 		
 		// Simple variable replacement
 		foreach($this->aVars as $sName => $sVar){
