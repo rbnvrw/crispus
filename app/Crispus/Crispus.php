@@ -61,17 +61,16 @@ class Crispus {
 		
 		// Add assets, blocks and config
 		$oTheme->setPageConfig($oPage->getConfig());
-		$oTheme->setTemplate($oPage->getTemplate());
 		$oTheme->addBlocks($oPage->getBlocks());
 		$oTheme->addAssets($oPage->getAssets());
-		$oTheme->setChildren($oPage->getChildren());
-		$oTheme->setUrl($this->determineUrl());
 
 		// Add page list for menus
 		$sPath = $this->_oConfig->getPath('pages');
 		
 		$oFilesystem = new Filesystem();
-		$oTheme->setPageList($oFilesystem->getAllPagesInDir($sPath, '', $this->sConfigFile));
+		$aPageList = $oFilesystem->getAllPagesInDir($sPath, '', $this->sConfigFile);
+		
+		$oTheme->setSitemapInfo($this->determineUrl(), $aPageList, $oPage->getChildren());
 		
 		return $oTheme->renderPage();		
 	}

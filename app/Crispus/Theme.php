@@ -17,6 +17,7 @@ class Theme {
 	
 	private $aPageConfig;
 	private $sTemplate;
+	private $sDefaultTemplate = 'index';
 	private $aBlocks;
 	private $aAssets;
 	private $aPageList;
@@ -54,10 +55,12 @@ class Theme {
 		        $this->aPageConfig = array();
 		    }
 		}
-	}
-	
-	public function setTemplate($sTemplate) {
-		$this->sTemplate = $sTemplate;
+		
+		if(isset($this->aPageConfig['template'])){
+		    $this->setTemplate($this->aPageConfig['template']);
+		}else{
+		    $this->setTemplate($this->sDefaultTemplate);
+		}
 	}
 	
 	public function addBlocks($aBlocks) {
@@ -68,16 +71,18 @@ class Theme {
 		$this->aAssets = $aAssets;
 	}
 	
-	public function setPageList($aPageList) {
+	public function setSitemapInfo($sUrl, $aPageList, $aChildren) {
 		$this->aPageList = $aPageList;
-	}
-	
-	public function setChildren($aChildren) {
 		$this->aChildren = $aChildren;
+		$this->sUrl = $sUrl;
 	}
 	
-	public function setUrl($sUrl) {
-		$this->sUrl = $sUrl;
+	private function setTemplate($sTemplate) {
+		$this->sTemplate = $sTemplate;
+		
+		if(empty($this->sTemplate)){
+		    $this->sTemplate = $this->sDefaultTemplate;    
+		}
 	}
 	
 	private function renderBlocks(){

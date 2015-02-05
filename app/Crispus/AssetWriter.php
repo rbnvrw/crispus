@@ -30,7 +30,7 @@ class AssetWriter extends \Assetic\AssetWriter {
     protected static function checkDir($sPath){
         $sDir = dirname($sPath);
         
-        if (!is_dir($sDir) && false === @mkdir($sDir, 0777, true)) {
+        if (!is_dir($sDir) && false === mkdir($sDir, 0777, true)) {
             throw new \RuntimeException('AssetWriter: Unable to create directory '.$sDir);
         }
         
@@ -38,7 +38,7 @@ class AssetWriter extends \Assetic\AssetWriter {
     }
     
     protected static function writeToFile($sPath, $sContents){
-        if (false === @file_put_contents($sPath, $sContents)) {
+        if (false === file_put_contents($sPath, $sContents)) {
             throw new \RuntimeException('AssetWriter: Unable to write file '.$sPath);
         }
         
