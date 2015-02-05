@@ -17,7 +17,7 @@
         "kriswallsmith/assetic": "dev-master",
         "patchwork/jsqueeze": "~2.0",
         "natxet/CssMin": "~3.0",
-        "james-heinrich/phpthumb": "~1.7"
+        "rbnvrw/phpthumb": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
