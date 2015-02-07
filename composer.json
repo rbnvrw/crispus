@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3",
+        "php": ">=5.4",
         "twig/twig": "~1.18",
         "cebe/markdown": "~1.0.1",
         "kriswallsmith/assetic": "dev-master",
