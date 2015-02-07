@@ -13,7 +13,7 @@
     "require": {
         "php": ">=5.3",
         "twig/twig": "~1.18",
-        "michelf/php-markdown": "~1.4",
+        "cebe/markdown": "~1.0.1",
         "kriswallsmith/assetic": "dev-master",
         "patchwork/jsqueeze": "~2.0",
         "natxet/CssMin": "~3.0",

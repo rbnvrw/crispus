@@ -1,3 +1,4 @@
 /vendor/*
 /build/*
+/tests/resources/data/cache/*
 composer.lock

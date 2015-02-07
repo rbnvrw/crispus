@@ -60,7 +60,8 @@ class Block {
 		}
 	    
 	    // Markdown
-	    $sContent = \Michelf\MarkdownExtra::defaultTransform($sContent);
+		$oParser = new \cebe\markdown\MarkdownExtra();
+	    $sContent = $oParser->parse($sContent);
 	    
 		return trim($sContent);
 	}
